@@ -1,0 +1,18 @@
+{
+  "name": "cs_ai_analyzer",
+  "version": "0.0.1",
+  "description": "Just a great idea being created",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest ."
+  },
+  "author": "Ariadne & Munchkin",
+  "license": "SEE LICENSE IN LICENSE.MD",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "typescript": "^5.8.3"
+  }
+}
