@@ -1,13 +1,17 @@
+import helmet from 'helmet';
 import express from 'express';
 import bodyParser from 'body-parser';
 import v1UserRouter from './routes/v1/user';
 import v1AuthRouter from './routes/v1/auth';
-
 // Importa los routers de cada versión y responsabilidad
 // Puedes seguir importando más routers según crezcas
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.disable('x-powered-by')
+
+app.use(helmet())
 
 app.use(bodyParser.json());
 
