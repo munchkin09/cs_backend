@@ -1,21 +1,4 @@
-export interface LLMProvider {
-    generateText(pathToVideo: string, options?: LLMGenerateOptions): Promise<LLMResponse>;
-}
-
-export interface LLMGenerateOptions {
-    model?: string;
-    temperature?: number;
-    maxTokens?: number;
-    stopSequences?: string[];
-    [key: string]: any;
-}
-
-export interface LLMResponse {
-    text: string;
-    usage?: {
-        promptTokens?: number;
-        completionTokens?: number;
-        totalTokens?: number;
-    };
-    rawResponse?: any;
-}
+export type { Database } from './database';
+export type { IAuthentication } from './auth';
+export type { IUser, IGeneration } from '../controllers/db/schemas';
+export type { LLMProvider, LLMGenerateOptions, LLMResponse } from './llm';
