@@ -1,8 +1,8 @@
-import type { Database, ISteamProfile } from "../types";
+import type { Database, ISteamProfile } from "../../types";
 
 import mongoose from "mongoose";
-import { User, Generation } from "./db/schemas";
-import type { IUser, IGeneration } from "./db/schemas";
+import { User, Generation } from "./schemas";
+import type { IUser, IGeneration } from "./schemas";
 
 const database: Database = {
     connect: async (uri: string) => {

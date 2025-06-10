@@ -1,4 +1,4 @@
-import { LLMGenerateOptions, LLMProvider, LLMResponse } from '../types/index';
+import { LLMGenerateOptions, LLMProvider, LLMResponse } from '../../types';
 
 export class GeminiImplementationController implements LLMProvider {
   // Implementa aquí los métodos y propiedades definidos en la interfaz GeminiImplementation
