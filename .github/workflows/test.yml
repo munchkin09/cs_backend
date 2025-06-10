@@ -16,7 +16,7 @@ jobs:
         node-version: '22.11.0'  # Use the version specified in .nvmrc
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci
 
     - name: Run tests
       run: npm test
