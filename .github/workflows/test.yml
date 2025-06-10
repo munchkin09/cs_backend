@@ -13,8 +13,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '22.x'  # Use the version specified in .nvmrc
-        cache: 'npm'
+        node-version: '22.11.0'  # Use the version specified in .nvmrc
 
     - name: Install dependencies
       run: npm install
