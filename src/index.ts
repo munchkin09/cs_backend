@@ -1,8 +1,9 @@
 import helmet from 'helmet';
 import express from 'express';
 import bodyParser from 'body-parser';
-import v1UserRouter from './routes/v1/user';
-import v1AuthRouter from './routes/v1/auth';
+import buildUserRouter from './routes/v1/user';
+import buildAuthRouter from './routes/v1/auth';
+import database from './controllers/database';
 // Importa los routers de cada versión y responsabilidad
 // Puedes seguir importando más routers según crezcas
 
@@ -16,8 +17,8 @@ app.use(helmet())
 app.use(bodyParser.json());
 
 // Monta los routers por versión y responsabilidad
-app.use('/api/v1/users', v1UserRouter);
-app.use('/api/v1/auth', v1AuthRouter);
+app.use('/api/v1/auth', buildAuthRouter(app));
+app.use('/api/v1/users', buildUserRouter());
 
 // Endpoint raíz
 app.get('/', (_req, res) => {
@@ -26,4 +27,5 @@ app.get('/', (_req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    database.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/CS_ANALYZER');
 });
