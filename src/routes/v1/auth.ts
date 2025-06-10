@@ -1,70 +1,73 @@
-import express, { Request, Response, RequestHandler } from "express";
+import type { Request, Response, RequestHandler, Application, Router } from "express";
 import passport from "passport";
 import session from "express-session";
-import AuthenticationController from "../../controllers/auth";
+import AuthenticationController from "../../controllers/authentication";
 import SteamStrategy from "passport-steam";
-const router = express.Router();
-const secretSession = process.env.SESSION_SECRET;
-const realm = process.env.DOMAIN || "http://localhost:3000";
-const domain = process.env.STEAM_RETURN_URL;
-const steamApiKey = process.env.STEAM_API_KEY;
 
-if (!secretSession) {
-    throw new Error("SESSION_SECRET environment variable is not set");
-}
+function buildAuthRouter(app: Application) {
+    const router = app.router;
+    const secretSession = process.env.SESSION_SECRET;
+    const realm = process.env.DOMAIN;
+    const domain = process.env.STEAM_RETURN_URL;
+    const steamApiKey = process.env.STEAM_API_KEY;
+    // Serialización y deserialización del usuario
+    passport.serializeUser((user, done) => done(null, user));
+    passport.deserializeUser((obj, done) => done(null, obj as Express.User));
 
-if (!realm) {
-    throw new Error("STEAM_API_KEY environment variable is not set");
-}
-
-if (!domain) {
-    throw new Error("DOMAIN environment variable is not set");
-}
-
-if (!steamApiKey) {
-    throw new Error("STEAM_API_KEY environment variable is not set");
-}
-
-// Estrategia de Steam
-passport.use(new SteamStrategy(
-    {
-        returnURL: `${domain}api/v1/auth/steam/return`,
-        realm,
-        apiKey: steamApiKey,
-    },
-    function (identifier, profile, done) {
-        profile.identifier = identifier;
-        return done(null, profile);
+    // Validación de variables de entorno
+    if (!secretSession) {
+        throw new Error("SESSION_SECRET environment variable is not set");
     }
-));
-// Middleware
-router.use(
-    session({
-        secret: secretSession,
-        resave: false,
-        saveUninitialized: false,
-    })
-);
 
-router.use(passport.initialize());
-router.use(passport.session());
+    if (!realm) {
+        throw new Error("DOMAIN environment variable is not set");
+    }
 
-// Middleware that is specific to this router
-const timeLog: RequestHandler = (req, res, next) => {
-    console.log("Time: ", Date.now());
-    console.log("Data: ", domain);
-    next();
-};
-router.use(timeLog);
+    if (!domain) {
+        throw new Error("STEAM_RETURN_URL environment variable is not set");
+    }
 
-router.get("/steam", AuthenticationController.login);
+    if (!steamApiKey) {
+        throw new Error("STEAM_API_KEY environment variable is not set");
+    }
 
-router.get("/steam/return", AuthenticationController.steamCallback);
+    // Estrategia de Steam
+    passport.use(new SteamStrategy(
+        {
+            returnURL: `${domain}api/v1/auth/steam/return`,
+            realm,
+            apiKey: steamApiKey,
+        },
+        AuthenticationController.isSuccessfulLogin
+    ));
+    // Middleware
+    app.use(
+        session({
+            secret: secretSession,
+            resave: false,
+            saveUninitialized: false,
+        })
+    );
 
-router.get("/logout", (req, res) => {
-    req.logout(() => {
-        res.redirect("/");
+    app.use(passport.initialize());
+    app.use(passport.session());
+
+    // Middleware that is specific to this router
+    const timeLog: RequestHandler = (req, res, next) => {
+        next();
+    };
+    router.use(timeLog);
+
+    router.get("/steam", AuthenticationController.login);
+
+    router.get("/steam/return", AuthenticationController.steamCallback);
+
+    router.get("/logout", (req: Request, res: Response) => {
+        req.logout(() => {
+            res.redirect("/");
+        });
     });
-});
+    return router;
+}
 
-export default router;
+export default buildAuthRouter;

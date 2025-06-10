@@ -1,34 +1,30 @@
-import express, { Request, Response, NextFunction, Router } from 'express';
-import { GeminiImplementationController } from '../../controllers/gemini_implementation'; // Adjust the import path as necessary
-const router = express.Router();
+import express, { Request, Response } from 'express';
 
-const { generateText } = new GeminiImplementationController();
-// Middleware that is specific to this router
-const timeLog: express.RequestHandler = (req, res, next) => {
-    console.log('Time: ', Date.now());
-    next();
-};
-router.use(timeLog);
+function buildUserRouter() {
+    // Middleware that is specific to this router
+    const router = express.Router();
+    const timeLog: express.RequestHandler = (req, res, next) => {
+        console.log('Time: ', Date.now());
+        next();
+    };
+    router.use(timeLog);
 
-// Define the home page route
-router.get('/', (req: Request, res: Response) => {
-    //Validar si el usuario está autenticado y redirigir a la página de inicio
-    res.send('Login with Steam');
-});
+    // Define the home page route
+    router.get('/', (req: Request, res: Response) => {
+        //Validar si el usuario está autenticado y redirigir a la página de inicio
+        res.send('Login with Steam');
+    });
 
-// Endpoint de login con steam
-router.post('/', (req: Request, res: Response) => {
-    
-    res.send('Login with Steam');
-});
+    // Endpoint de login con steam
+    router.post('/', (req: Request, res: Response) => {
+        
+        res.send('Login with Steam');
+    });
 
-router.post('/dame-tu-demo/:demo-code', (req: Request, res: Response) => {
-    // processDemo(req.params['demo-code']);
-    generateText(req.body.pathToVideo, req.body.options);
-    res.send('Login with Steam');
-});
+    return router;
+}
 
-export default router;
+export default buildUserRouter;
 /**
  * Processes the video at
     throw new Error('Function not implemented.');
