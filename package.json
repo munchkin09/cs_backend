@@ -10,8 +10,7 @@
     "test": "jest . --runInBand",
     "test:watch": "jest . --watch",
     "test:coverage": "jest . --coverage",
-    "test:coverage:watch": "jest . --coverage --watch",
-    "start:dev": ""
+    "test:coverage:watch": "jest . --coverage --watch"
   },
   "author": "Ariadne & Munchkin",
   "license": "SEE LICENSE IN LICENSE.MD",
@@ -21,6 +20,7 @@
     "express-session": "1.18.1",
     "helmet": "8.1.0",
     "mongoose": "8.15.1",
+    "multer": "2.0.1",
     "passport": "0.7.0",
     "passport-steam": "1.0.18"
   },
