@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Subida de Video + Steam Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        h2 {
+            margin-bottom: 1rem;
+        }
+
+        input[type="file"] {
+            margin-bottom: 1rem;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            margin-top: 1rem;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Sube tu vídeo (solo .mp4)</h2>
+    <input type="file" id="videoInput" accept="video/mp4">
+    <button id="uploadBtn">Subir video</button>
+
+    <hr>
+
+    <button id="steamLoginBtn">Login con Steam</button>
+
+    <script src="/main.js"></script>
+</body>
+
+</html>
