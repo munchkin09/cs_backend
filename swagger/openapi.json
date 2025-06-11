@@ -1,0 +1,184 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "CS AI Analyzer API",
+        "version": "0.0.1",
+        "description": "API para análisis de vídeos y autenticación con Steam."
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3000"
+        }
+    ],
+    "paths": {
+        "/": {
+            "get": {
+                "summary": "Página principal",
+                "responses": {
+                "200": {
+                    "description": "Devuelve la página principal"
+                }
+                }
+            }
+        },
+        "/auth/steam": {
+        "get": {
+            "summary": "Iniciar login con Steam",
+            "responses": {
+            "302": {
+                "description": "Redirección a Steam para autenticación"
+            }
+            }
+        }
+        },
+        "/auth/steam/return": {
+        "get": {
+            "summary": "Callback de Steam",
+            "responses": {
+            "302": {
+                "description": "Redirección tras autenticación"
+            }
+            }
+        }
+        },
+        "/auth/logout": {
+        "get": {
+            "summary": "Cerrar sesión",
+            "responses": {
+            "302": {
+                "description": "Redirección a la página principal"
+            }
+            }
+        }
+        },
+        "/api/v1/users/": {
+        "get": {
+            "summary": "Página de login de usuario",
+            "responses": {
+            "200": {
+                "description": "Devuelve mensaje de login"
+            }
+            }
+        },
+        "post": {
+            "summary": "Login de usuario",
+            "responses": {
+            "200": {
+                "description": "Devuelve mensaje de login"
+            }
+            }
+        }
+        },
+        "/api/v1/generation/upload": {
+        "post": {
+            "summary": "Subir vídeo",
+            "requestBody": {
+            "required": true,
+            "content": {
+                "multipart/form-data": {
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                    "video": {
+                        "type": "string",
+                        "format": "binary"
+                    }
+                    },
+                    "required": ["video"]
+                }
+                }
+            }
+            },
+            "responses": {
+            "200": {
+                "description": "Vídeo subido correctamente"
+            },
+            "400": {
+                "description": "No se subió ningún archivo"
+            }
+            }
+        }
+        },
+        "/api/v1/generation/generate": {
+        "post": {
+            "summary": "Generar análisis de vídeo",
+            "requestBody": {
+            "required": true,
+            "content": {
+                "application/json": {
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                    "file": {
+                        "type": "string",
+                        "description": "Ruta al archivo de vídeo subido"
+                    }
+                    },
+                    "required": ["file"]
+                }
+                }
+            }
+            },
+            "responses": {
+            "200": {
+                "description": "Generación iniciada",
+                "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "message": { "type": "string" },
+                            "jobId": { "type": "string" }
+                        }
+                    }
+                }
+                }
+            },
+            "500": {
+                "description": "Error interno del servidor"
+                }
+            }
+        }
+        }
+    },
+    "components": {
+        "schemas": {
+            "User": {
+                "type": "object",
+                "properties": {
+                "steamId": { "type": "string" },
+                "displayName": { "type": "string" },
+                "profileUrl": { "type": "string" },
+                "avatarUrl": { "type": "string" },
+                "communityvisibilitystate": { "type": "integer" },
+                "profilestate": { "type": "integer" },
+                "personaname": { "type": "string" },
+                "commentpermission": { "type": "integer" },
+                "profileurl": { "type": "string" },
+                "avatar": { "type": "string" },
+                "avatarmedium": { "type": "string" },
+                "avatarfull": { "type": "string" },
+                "avatarhash": { "type": "string" },
+                "lastlogoff": { "type": "integer" },
+                "personastate": { "type": "integer" },
+                "realname": { "type": "string" },
+                "primaryclanid": { "type": "string" },
+                "timecreated": { "type": "integer" },
+                "personastateflags": { "type": "integer" },
+                "loccountrycode": { "type": "string" },
+                "locstatecode": { "type": "string" }
+                },
+                "required": ["steamId", "displayName", "profileUrl"]
+            },
+            "Generation": {
+                "type": "object",
+                "properties": {
+                "steamId": { "type": "string" },
+                "dateTime": { "type": "string", "format": "date-time" },
+                "responseLLM": { "type": "string" }
+                },
+                "required": ["steamId", "responseLLM"]
+            }
+        }
+    }
+}
