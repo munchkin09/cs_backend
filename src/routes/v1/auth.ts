@@ -10,6 +10,7 @@ function buildAuthRouter(app: Application) {
     const realm = process.env.DOMAIN;
     const domain = process.env.STEAM_RETURN_URL;
     const steamApiKey = process.env.STEAM_API_KEY;
+    
     // Serialización y deserialización del usuario
     passport.serializeUser((user, done) => done(null, user));
     passport.deserializeUser((obj, done) => done(null, obj as Express.User));
@@ -34,12 +35,13 @@ function buildAuthRouter(app: Application) {
     // Estrategia de Steam
     passport.use(new SteamStrategy(
         {
-            returnURL: `${domain}api/v1/auth/steam/return`,
+            returnURL: `${domain}steam/return`,
             realm,
             apiKey: steamApiKey,
         },
         AuthenticationController.isSuccessfulLogin
     ));
+
     // Middleware
     app.use(
         session({
@@ -54,6 +56,7 @@ function buildAuthRouter(app: Application) {
 
     // Middleware that is specific to this router
     const timeLog: RequestHandler = (req, res, next) => {
+        console.log(`AUTH MIDDLEWARE Request Method: ${req.method}, Request URL: ${req.url}`);
         next();
     };
     router.use(timeLog);
@@ -67,7 +70,15 @@ function buildAuthRouter(app: Application) {
             res.redirect("/");
         });
     });
-    return router;
+
+    const authMiddleware: RequestHandler = (req, res, next) => {
+        if (req.isAuthenticated()) {
+            console.log("User method for every request isAuthenticated:", req.session.id);
+            return next();
+        }
+        return next();
+    };
+    return {router, authMiddleware};
 }
 
 export default buildAuthRouter;
