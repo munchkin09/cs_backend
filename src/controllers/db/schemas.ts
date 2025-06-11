@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 // Define the schema for the User model
-export interface IUser extends Document {
+export interface IUserModel extends Document {
   steamId: string;
   displayName: string;
   profileUrl: string;
@@ -25,7 +25,7 @@ export interface IUser extends Document {
   locstatecode?: string;
 }
 
-export interface IGeneration extends Document {
+export interface IGenerationModel extends Document {
   steamId: string;
   dateTime: string;
   responseLLM: string;
@@ -65,6 +65,6 @@ const generationSchema = new Schema({
     timestamps: true,
 });
 
-export const User = mongoose.model<IUser>('Users', userSchema);
-export const Generation = mongoose.model<IGeneration>('Generations', generationSchema);
+export const User = mongoose.model<IUserModel>('Users', userSchema);
+export const Generation = mongoose.model<IGenerationModel>('Generations', generationSchema);
 
