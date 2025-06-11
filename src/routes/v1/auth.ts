@@ -54,13 +54,7 @@ function buildAuthRouter(app: Application) {
     app.use(passport.initialize());
     app.use(passport.session());
 
-    // Middleware that is specific to this router
-    const timeLog: RequestHandler = (req, res, next) => {
-        console.log(`AUTH MIDDLEWARE Request Method: ${req.method}, Request URL: ${req.url}`);
-        next();
-    };
-    router.use(timeLog);
-
+    
     router.get("/steam", AuthenticationController.login);
 
     router.get("/steam/return", AuthenticationController.steamCallback);
@@ -72,13 +66,19 @@ function buildAuthRouter(app: Application) {
     });
 
     const authMiddleware: RequestHandler = (req, res, next) => {
+        if (req.path === "/") {
+            console.log("User method for root path avoid checks");
+            next();
+            return;
+        }
+        console.log(req.session);
         if (req.isAuthenticated()) {
-            console.log("User method for every request isAuthenticated:", req.session.id);
+            console.log("User method for every request isAuthenticated:", req.session);
             return next();
         }
         return next();
     };
-    return {router, authMiddleware};
+    return { router, authMiddleware };
 }
 
 export default buildAuthRouter;

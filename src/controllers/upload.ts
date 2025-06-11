@@ -7,8 +7,7 @@ import { Request } from 'express';
 import { FileFilterCallback } from 'multer';
 
 export default function buildUploadProcessor() {
-    const __dirname = cwd();
-    const uploadDir = path.join(__dirname, 'uploads');
+    const uploadDir = path.join(cwd(), 'uploads');
     if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 
     // Configuración del almacenamiento con multer
