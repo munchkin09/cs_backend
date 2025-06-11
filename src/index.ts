@@ -9,10 +9,8 @@ import database from './controllers/db/database';
 import SwaggerUIDist from 'swagger-ui-dist';
 import { buildUserRouter , buildGenerationRouter, buildAuthRouter } from './routes/v1/';
 
-
-
-// Importa los routers de cada versión y responsabilidad
 // Puedes seguir importando más routers según crezcas
+const env = process.env.NODE_ENV || 'development';
 const app = express();
 const PORT = process.env.PORT || 3000;
 const configuration: IConfiguration = {
@@ -28,22 +26,32 @@ app.use(helmet());
 
 app.use(bodyParser.json());
 
-const swaggerUiAssetPath = SwaggerUIDist.getAbsoluteFSPath();
+
+if (env === 'development') {
+
+    const swaggerUiPath = SwaggerUIDist.getAbsoluteFSPath();
+    // 1. Sirve la spec OpenAPI
+    app.get('/swagger.json', (_, res) => {
+    res.sendFile(path.join(cwd(),'swagger', 'openapi.json'));
+    });
+
+    // 2. Sirve los assets de Swagger UI
+    app.use('/docs-assets', express.static(swaggerUiPath));
+
+    // 3. Sirve el HTML y JS de la carpeta public/docs
+    app.use('/docs', express.static(path.join(cwd(), 'docs')));
+
+    // Endpoint raíz
+    app.use(express.static(path.join(cwd(), 'static')))
+
+    app.get('/', (req, res) => {
+        res.sendFile(path.join(cwd(), 'static', 'index.html'));
+    });
+}
+
 const { router: authRouter, authMiddleware } = buildAuthRouter(app);
-
-app.use('/docs', express.static(swaggerUiAssetPath));
-
-app.get('/swagger.json', (req: Request, res: Response) => {
-    res.sendFile(path.join(cwd(), 'swagger', 'openapi.json'));
-});
 app.use(authMiddleware);
 
-// Endpoint raíz
-app.use(express.static(path.join(cwd(), 'static')))
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(cwd(), 'static', 'index.html'));
-});
 
 // Monta los routers por versión y responsabilidad
 app.use('/auth', authRouter);
