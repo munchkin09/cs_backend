@@ -4,35 +4,43 @@ import type { IAuthentication, ISteamProfile } from "../types";
 import database from "./db/database";
 
 
-const AuthenticationController: IAuthentication = {
+function buildAuthenticationController(): IAuthentication {
     // Endpoint de login con steam
-    login: async (req: Request, res: Response) => {
+    const login = async (req: Request, res: Response) => {
         passport.authenticate("steam", { failureRedirect: "/login" })(req, res);
-    },
+    };
 
     // Callback de Steam después de la autenticación
-    steamCallback: async (req: Request, res: Response) => {
+    const steamCallback = async (req: Request, res: Response) => {
         passport.authenticate("steam", { failureRedirect: "/login" })(
         req,res,() => {
+            console.log("User authenticated successfully:", req.user);
             res.redirect("/");
         });
-    },
+    };
 
     // Middleware para verificar si el usuario está autenticado
-    isAuthenticated: (req: Request, res: Response, next: NextFunction) => {
+    const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
         if (req.isAuthenticated()) {
             console.log("User method isAuthenticated:", req.session.id);
             return next();
         }
         res.redirect("auth/login");
-    },
+    };
 
     // Método que se llama cuando la autenticación es exitosa
-    isSuccessfulLogin: async (_: string, profile:any, done: (err: any, profile?: ISteamProfile) => void) => {
+    const isSuccessfulLogin = async (_: string, profile:any, done: (err: any, profile?: ISteamProfile) => void) => {
         await database.createOrUpdateUser(profile);
         console.log("User authenticated:", profile.id);
         return done(null, profile);
     }
+
+    return {
+        login,
+        steamCallback,
+        isAuthenticated,
+        isSuccessfulLogin
+    };
 };
 
-export default AuthenticationController;
+export default buildAuthenticationController;

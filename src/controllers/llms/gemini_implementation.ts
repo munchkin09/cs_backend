@@ -1,4 +1,4 @@
-import { LLMGenerateOptions, LLMProvider, LLMResponse } from '../../types';
+import { LLMProvider, LLMResponse } from '../../types';
 
 import { GoogleGenAI, File, HarmCategory, HarmBlockThreshold, Part } from '@google/genai'; // Asegúrate de tener instalado este paquete
 const API_KEY = process.env.LLM_API_KEY || ''; // O define tu API_KEY aquí
@@ -18,69 +18,66 @@ export class GeminiImplementationController implements LLMProvider {
 
   private async analyzeVideoWithGemini(videoPath: string, videoMimeType: string, prompt: string): Promise<string> {
     const safetySettings = [
-    {
-      category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-    },
-    {
-      category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-    },
-    {
-      category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-    },
-    {
-      category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-    },
-  ];
-    
-    try {
-      const genAI = new GoogleGenAI({ apiKey: API_KEY});
-      const file: File = await genAI.files.upload({file: videoPath, config: {
-      mimeType: videoMimeType
-    }});
-        // 2. Preparar el contenido para el modelo
-    const model = genAI.models.generateContent({
-      model: 'gemini-1.5-flash',
-    });
-
-    const parts: Part[] = [
-      { text: prompt },
       {
-        // Referenciar el archivo subido usando su URI
-        fileData: {
-          mimeType: videoFile.mimeType,
-          fileUri: videoFile.uri,
-        },
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
       },
     ];
 
-    console.log("Enviando solicitud a Gemini con la referencia del archivo...");
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts }],
-      // generationConfig: { // Opcional
-      //   temperature: 0.4,
-      //   maxOutputTokens: 8192,
-      // },
-    });
+    const genAI = new GoogleGenAI({ apiKey: API_KEY});
+    // Read the video file and encode it as base64
+    const fs = await import('fs/promises');
+    
+    try {
+      const videoBuffer = await fs.readFile(videoPath);
+      const base64Video = videoBuffer.toString('base64');
+      const config = { responseMimeType: 'text/plain', };
+      const model = 'gemini-2.5-pro-preview-06-05';
+      const contents = [{
+        role: 'user',
+        parts: [
+          {
+            text: `Hola, te voy a pasar un enlace a un video para que puedas procesarlo, te voy a dar unas cuantas instrucciones sobre el contenido, lo que tienes que analizar, y que clase de output espero. El video es un jugador de Counter Strike 2 jugando las primeras rondas de una partida competitiva. Deberás hacer un análisis con las siguientes cualidades: Analiza y expón las cualidades vitales de la persona que estás viendo jugar. Usa un lenguaje poco formal, muy rollo de los 90, como tu sabes, guapetón(usa esta ultima frase como ejemplo de lenguaje desenfadado). Una vez tengas un análisis de la persona que estás viendo jugar deberás decidir un conjunto de Skins que consideres que pegarían con el estilo del jugador y con su forma de ser. Por cada arma, personaje, guantes o cuchillo que elijas deberás proporcionar una justificación de por que has elegido este elemento. El formato esperado será un JSON con la siguiente definición: { "type_skin": "gloves|knife|weapon|character", "choosen_skin": "string", "justification": "string" } Después de terminar el análisis dedica unas palabras a dar una última reflexión sobre como juega el jugador, que sea inspiradora y permita que quien lo lea se pueda sentir identificado(ten en cuenta el efecto forer, las personas aceptas muy bien los halagos ligeros o vagos que no se meten en mucho detalle). Aquí te dejo el video que debes analizar, espero que te lo pases igual de bien que yo haciendo esto:`
+          },
+          {
+            inlineData: {
+              data: base64Video
+            },
+            mimeType: `video/mp4`
+          }
+        ]
+      }];
+      const response = await genAI.models.generateContentStream({ model, config, contents }); let fileIndex = 0;
+      for await (const chunk of response) {
+        console.log(chunk.text);
+      }
 
-    const responseText = result.response.text();
-    console.log("\n--- Respuesta de Gemini ---");
-    console.log(responseText);
-    console.log("-------------------------\n");
-  } catch (error) {
-    console.error("Error analizando el video con Gemini:", error);
-    if (error instanceof Error && error.message.includes("SAFETY")) {
+      console.log("\n--- Respuesta de Gemini ---");
+      console.log(response);
+      console.log("-------------------------\n");
+    } catch (error) {
+      console.error("Error analizando el video con Gemini:", error);
+      if (error instanceof Error && error.message.includes("SAFETY")) {
         console.error("La respuesta fue bloqueada debido a la configuración de seguridad.");
         // Podrías querer inspeccionar `error.response.promptFeedback` si existe
-    } else if (error instanceof Error && error.message.includes("quota")) {
+      } else if (error instanceof Error && error.message.includes("quota")) {
         console.error("Se ha excedido la cuota de la API. Revisa tu plan y uso en Google Cloud Console.");
-    } else if (error instanceof Error && error.message.includes("Invalid API key")) {
+      } else if (error instanceof Error && error.message.includes("Invalid API key")) {
         console.error("La API Key no es válida. Verifica que esté bien configurada.");
+      }
     }
-  }
-  return '';
-};
+    return '';
+  };
 }

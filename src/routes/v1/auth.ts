@@ -1,16 +1,17 @@
 import type { Request, Response, RequestHandler, Application, Router } from "express";
 import passport from "passport";
 import session from "express-session";
-import AuthenticationController from "../../controllers/authentication";
+import { buildAuthenticationController } from "../../controllers";
 import SteamStrategy from "passport-steam";
+import type { IConfiguration } from "../../types";
 
-function buildAuthRouter(app: Application) {
+function buildAuthRouter(app: Application, configuration: IConfiguration) {
     const router = app.router;
     const secretSession = process.env.SESSION_SECRET;
     const realm = process.env.DOMAIN;
     const domain = process.env.STEAM_RETURN_URL;
     const steamApiKey = process.env.STEAM_API_KEY;
-    
+    const AuthenticationController = buildAuthenticationController();
     // Serialización y deserialización del usuario
     passport.serializeUser((user, done) => done(null, user));
     passport.deserializeUser((obj, done) => done(null, obj as Express.User));
@@ -66,19 +67,42 @@ function buildAuthRouter(app: Application) {
     });
 
     const authMiddleware: RequestHandler = (req, res, next) => {
-        if (req.path === "/") {
-            console.log("User method for root path avoid checks");
+        console.log("Auth middleware for every request:", req.path);
+        if (isPathAllowed(req.path) === true) {
             next();
             return;
         }
-        console.log(req.session);
+
         if (req.isAuthenticated()) {
             console.log("User method for every request isAuthenticated:", req.session);
-            return next();
+            next();
+            return;
         }
-        return next();
+
+        next(new Error("User not authenticated"));
     };
+
     return { router, authMiddleware };
+
+    function isPathAllowed(path: string): boolean {
+    if (configuration.environment !== "production") {
+        // En entornos de desarrollo, permite todas las rutas
+        return true;
+    }
+    const allowedPaths = [
+        "/api/v1/generate/upload",
+        "/auth/steam",
+        "/auth/steam/return",
+        "/auth/logout",
+        "/docs",
+        "/swagger.json",
+        "/static",
+        "/main.js",
+        "/favicon.ico"
+    ];
+
+    return allowedPaths.some(allowedPath => path.startsWith(allowedPath));
+}
 }
 
 export default buildAuthRouter;

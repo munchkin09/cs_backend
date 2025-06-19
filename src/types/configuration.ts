@@ -3,4 +3,5 @@ export interface IConfiguration {
     llmApiKey: string; // Clave API para el proveedor de LLM
     databaseUrl: string; // URL de la base de datos
     databaseName: string; // Nombre de la base de datos
+    environment?: string; // Entorno de ejecución, por ejemplo, "development" o "production"
 }

@@ -3,42 +3,80 @@ const API_BASE_URL = 'http://localhost:3000';
 const VIDEO_UPLOAD_ENDPOINT = '/api/v1/generation/upload';
 const STEAM_LOGIN_ENDPOINT = '/auth/steam';
 
-// Lógica de subida
-document.getElementById('uploadBtn').addEventListener('click', async () => {
-    const fileInput = document.getElementById('videoInput');
-    const file = fileInput.files[0];
+document.addEventListener('DOMContentLoaded', () => {
+    let videoName = '';
+    const videoInput = document.getElementById('videoUrl');
+    const generateButton = document.getElementById('generateBtn');
 
-    if (!file) {
-        alert('Selecciona un archivo primero.');
-        return;
-    }
+    // Lógica de subida
+    document.getElementById('uploadBtn').addEventListener('click', async () => {
+        const fileInput = document.getElementById('videoInput');
+        const file = fileInput.files[0];
 
-    if (file.type !== 'video/mp4') {
-        alert('Solo se permiten archivos .mp4');
-        return;
-    }
+        if (!file) {
+            alert('Selecciona un archivo primero.');
+            return;
+        }
 
-    const formData = new FormData();
-    formData.append('video', file);
+        if (file.type !== 'video/mp4') {
+            alert('Solo se permiten archivos .mp4');
+            return;
+        }
 
-    try {
-        const response = await fetch(`${API_BASE_URL}${VIDEO_UPLOAD_ENDPOINT}`, {
-            method: 'POST',
-            body: formData
-        });
+        const formData = new FormData();
+        formData.append('video', file);
 
-        if (!response.ok) throw new Error('Error en la subida');
+        try {
+            const response = await fetch(`${API_BASE_URL}${VIDEO_UPLOAD_ENDPOINT}`, {
+                method: 'POST',
+                body: formData
+            });
 
-        const result = await response.json();
-        alert('Vídeo subido con éxito!');
-        console.log(result);
-    } catch (err) {
-        console.error(err);
-        alert('Falló la subida del vídeo.');
-    }
+            if (!response.ok) throw new Error('Error en la subida');
+            const result = await response.json();
+            alert('Video subido con éxito!');
+
+            generateButton.disabled = false; // Deshabilitar el botón después de procesar
+            videoInput.value = result.message; // Asignar la URL del video al input
+
+        } catch (err) {
+            console.error(err);
+            alert('Falló la subida del vídeo.');
+        }
+    });
+
+    // Redirección al login de Steam
+    document.getElementById('steamLoginBtn').addEventListener('click', () => {
+        window.location.href = `${API_BASE_URL}${STEAM_LOGIN_ENDPOINT}`;
+    });    // Lógica para procesar el nombre del video
+    generateButton.addEventListener('click', async (e) => {
+        e.preventDefault(); // Prevenir el comportamiento por defecto
+        
+        if (!videoInput.value) {
+            alert('Por favor, sube un video primero.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/v1/generation/generate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ videoName: videoInput.value })
+            });
+
+            if (!response.ok) throw new Error('Error al procesar el video');
+
+            const result = await response.json();
+            alert('Video procesado con éxito!');
+
+        } catch (err) {
+            console.error(err);
+            alert('Falló el procesamiento del video.');
+        }
+    });
 });
 
-// Redirección al login de Steam
-document.getElementById('steamLoginBtn').addEventListener('click', () => {
-    window.location.href = `${API_BASE_URL}${STEAM_LOGIN_ENDPOINT}`;
-});
+
+

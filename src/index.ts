@@ -3,7 +3,6 @@ import { cwd } from 'process';
 import express from 'express';
 import helmet from 'helmet';
 import bodyParser from 'body-parser';
-import type { Request, Response } from 'express';
 import { IConfiguration } from './types';
 import database from './controllers/db/database';
 import SwaggerUIDist from 'swagger-ui-dist';
@@ -17,7 +16,8 @@ const configuration: IConfiguration = {
     llmProvider: process.env.LLM_PROVIDER || 'gemini',
     llmApiKey: process.env.LLM_API_KEY || '',
     databaseUrl: process.env.MONGODB_URI as string || 'mongodb://localhost:27017',
-    databaseName: process.env.MONGODB_NAME || 'csainalyzer'
+    databaseName: process.env.MONGODB_NAME || 'csainalyzer',
+    environment: process.env.NODE_ENV,
 };
 
 app.disable('x-powered-by');
@@ -49,9 +49,19 @@ if (env === 'development') {
     });
 }
 
-const { router: authRouter, authMiddleware } = buildAuthRouter(app);
+// Servir archivos estáticos ANTES del middleware de autenticación
+app.use(express.static(path.join(cwd(), 'static')))
+
+// Endpoint raíz
+app.get('/', (req, res) => {
+    res.status(200).sendFile(path.join(cwd(), 'static', 'index.html'));
+    return;
+});
+const { router: authRouter, authMiddleware } = buildAuthRouter(app, configuration);
 app.use(authMiddleware);
 
+
+app.use(authMiddleware);
 
 // Monta los routers por versión y responsabilidad
 app.use('/auth', authRouter);
