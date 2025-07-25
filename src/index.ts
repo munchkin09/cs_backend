@@ -16,8 +16,7 @@ const PORT = process.env.PORT || 3000;
 const configuration: IConfiguration = {
     llmProvider: process.env.LLM_PROVIDER || 'gemini',
     llmApiKey: process.env.LLM_API_KEY || '',
-    databaseUrl: process.env.MONGODB_URI as string || 'mongodb://localhost:27017',
-    databaseName: process.env.MONGODB_NAME || 'csainalyzer',
+    dbConnectionString: process.env.AZURE_COSMOS_CONNECTIONSTRING as string || 'mongodb://localhost:27017',
     environment: process.env.NODE_ENV,
 };
 
@@ -78,11 +77,11 @@ app.listen(PORT, async () => {
     await initializeFFmpeg();
     
     // Conectar a la base de datos
-    await database.connect(configuration.databaseUrl, configuration.databaseName);
+    await database.connect(configuration.dbConnectionString);
     
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`🤖 LLM Provider: ${configuration.llmProvider}`);
-    console.log(`🗄️  Database URL: ${configuration.databaseUrl}`);
-    console.log(`📊 Database Name: ${configuration.databaseName}`);
+    console.log(`🗄️  Database URL: ${configuration.dbConnectionString}`);
+    console.log(`📊 Database Name: CSAnalyzer`);
     console.log(`🌍 Environment: ${configuration.environment || 'development'}`);
 });
