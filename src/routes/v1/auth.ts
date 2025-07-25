@@ -67,8 +67,9 @@ function buildAuthRouter(app: Application, configuration: IConfiguration) {
     });
 
     const authMiddleware: RequestHandler = (req, res, next) => {
-        console.log("Auth middleware for every request:", req.path);
+        
         if (isPathAllowed(req.path) === true) {
+            console.log("Auth middleware for every request:", req.path);
             next();
             return;
         }

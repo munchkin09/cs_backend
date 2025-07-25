@@ -36,37 +36,63 @@ export class GeminiImplementationController implements LLMProvider {
       },
     ];
 
-    const genAI = new GoogleGenAI({ apiKey: API_KEY});
-    // Read the video file and encode it as base64
     const fs = await import('fs/promises');
     
     try {
+      // Verificar tamaño del archivo antes de procesarlo
+      const stats = await fs.stat(videoPath);
+      const fileSizeInMB = stats.size / (1024 * 1024);
+      
+      console.log(`Tamaño del video: ${fileSizeInMB.toFixed(2)} MB`);
+      
+      // Límite de aproximadamente 20MB para base64 (se expande ~33% al codificar)
+      if (stats.size > 20 * 1024 * 1024) {
+        throw new Error(`El archivo es demasiado grande (${fileSizeInMB.toFixed(2)} MB). El límite es de aproximadamente 20MB.`);
+      }
+
       const videoBuffer = await fs.readFile(videoPath);
       const base64Video = videoBuffer.toString('base64');
-      const config = { responseMimeType: 'text/plain', };
-      const model = 'gemini-2.5-pro-preview-06-05';
+      
+      const genAI = new GoogleGenAI({ apiKey: API_KEY });
+      
+      const promptText = `Hola, te voy a pasar un video para que puedas procesarlo, te voy a dar unas cuantas instrucciones sobre el contenido, lo que tienes que analizar, y que clase de output espero. El video es un jugador de Counter Strike 2 jugando las primeras rondas de una partida competitiva. Deberás hacer un análisis con las siguientes cualidades: Analiza y expón las cualidades vitales de la persona que estás viendo jugar. Usa un lenguaje poco formal, muy rollo de los 90, como tu sabes, guapetón(usa esta ultima frase como ejemplo de lenguaje desenfadado). Una vez tengas un análisis de la persona que estás viendo jugar deberás decidir un conjunto de Skins que consideres que pegarían con el estilo del jugador y con su forma de ser. Por cada arma, personaje, guantes o cuchillo que elijas deberás proporcionar una justificación de por que has elegido este elemento. El formato esperado será un JSON con la siguiente definición: { "type_skin": "gloves|knife|weapon|character", "choosen_skin": "string", "justification": "string" } Después de terminar el análisis dedica unas palabras a dar una última reflexión sobre como juega el jugador, que sea inspiradora y permita que quien lo lea se pueda sentir identificado(ten en cuenta el efecto forer, las personas aceptas muy bien los halagos ligeros o vagos que no se meten en mucho detalle). Aquí te dejo el video que debes analizar, espero que te lo pases igual de bien que yo haciendo esto:`;
+
+      const config = { 
+        responseMimeType: 'text/plain',
+        safetySettings: safetySettings
+      };
+      
+      const model = 'gemini-1.5-pro';
+      
       const contents = [{
         role: 'user',
         parts: [
-          {
-            text: `Hola, te voy a pasar un enlace a un video para que puedas procesarlo, te voy a dar unas cuantas instrucciones sobre el contenido, lo que tienes que analizar, y que clase de output espero. El video es un jugador de Counter Strike 2 jugando las primeras rondas de una partida competitiva. Deberás hacer un análisis con las siguientes cualidades: Analiza y expón las cualidades vitales de la persona que estás viendo jugar. Usa un lenguaje poco formal, muy rollo de los 90, como tu sabes, guapetón(usa esta ultima frase como ejemplo de lenguaje desenfadado). Una vez tengas un análisis de la persona que estás viendo jugar deberás decidir un conjunto de Skins que consideres que pegarían con el estilo del jugador y con su forma de ser. Por cada arma, personaje, guantes o cuchillo que elijas deberás proporcionar una justificación de por que has elegido este elemento. El formato esperado será un JSON con la siguiente definición: { "type_skin": "gloves|knife|weapon|character", "choosen_skin": "string", "justification": "string" } Después de terminar el análisis dedica unas palabras a dar una última reflexión sobre como juega el jugador, que sea inspiradora y permita que quien lo lea se pueda sentir identificado(ten en cuenta el efecto forer, las personas aceptas muy bien los halagos ligeros o vagos que no se meten en mucho detalle). Aquí te dejo el video que debes analizar, espero que te lo pases igual de bien que yo haciendo esto:`
-          },
+          { text: promptText },
           {
             inlineData: {
-              data: base64Video
-            },
-            mimeType: `video/mp4`
+              data: base64Video,
+              mimeType: 'video/mp4'
+            }
           }
         ]
       }];
-      const response = await genAI.models.generateContentStream({ model, config, contents }); let fileIndex = 0;
+
+      const response = await genAI.models.generateContentStream({ model, config, contents });
+      
+      let responseText = '';
       for await (const chunk of response) {
-        console.log(chunk.text);
+        if (chunk.text) {
+          const chunkText = chunk.text;
+          responseText += chunkText;
+          console.log(chunkText);
+        }
       }
 
       console.log("\n--- Respuesta de Gemini ---");
-      console.log(response);
+      console.log(responseText);
       console.log("-------------------------\n");
+      
+      return responseText;
     } catch (error) {
       console.error("Error analizando el video con Gemini:", error);
       if (error instanceof Error && error.message.includes("SAFETY")) {
