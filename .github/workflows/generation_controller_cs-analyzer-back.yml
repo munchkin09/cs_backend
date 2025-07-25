@@ -64,7 +64,7 @@ jobs:
           echo "DOMAIN=${{secrets.DOMAIN}}" >> .env
           echo "MONGODB_URI=${{secrets.MONGODB_URI}}" >> .env
           echo "AZURE_COSMOS_CONNECTIONSTRING=${{secrets.AZURE_COSMOS_CONNECTIONSTRING}}" >> .env
-          echo "NODE_ENV=production" >> .env
+          echo "NODE_ENV=development" >> .env
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
