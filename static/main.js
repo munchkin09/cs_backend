@@ -52,10 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
     generateButton.addEventListener('click', async (e) => {
         e.preventDefault(); // Prevenir el comportamiento por defecto
         
-        if (!videoInput.value) {
+        /*if (!videoInput.value) {
             alert('Por favor, sube un video primero.');
             return;
-        }
+        }*/
 
         try {
             const response = await fetch(`${API_BASE_URL}/api/v1/generation/generate`, {
