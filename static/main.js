@@ -1,5 +1,5 @@
 // Configuración (puedes cambiar esto sin tocar el resto del código)
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'https://cs-analyzer-back-aedyhwcwapd5b2dx.swedencentral-01.azurewebsites.net';
 const VIDEO_UPLOAD_ENDPOINT = '/api/v1/generation/upload';
 const STEAM_LOGIN_ENDPOINT = '/auth/steam';
 
