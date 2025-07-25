@@ -1,8 +1,8 @@
 import path from "path";
 import { cwd } from "process";
 import type { Request, Response, RequestHandler, Application, Router, NextFunction } from "express";
-import { IConfiguration } from "../../types";
-import { buildGenerationController, buildUploadProcessor } from "../../controllers";
+import { IConfiguration } from "../../types/index.js";
+import { buildGenerationController, buildUploadProcessor } from "../../controllers/index.js";
 
 function buildGenerationRouter(app: Application, configuration: IConfiguration) {
     const router = app.router;

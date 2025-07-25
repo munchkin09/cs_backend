@@ -1,4 +1,4 @@
-import { LLMProvider, LLMResponse } from '../../types';
+import { LLMProvider, LLMResponse } from '../../types/index.js';
 
 import { GoogleGenAI, File, HarmCategory, HarmBlockThreshold, Part } from '@google/genai'; // Asegúrate de tener instalado este paquete
 const API_KEY = process.env.LLM_API_KEY || ''; // O define tu API_KEY aquí

@@ -1,6 +1,6 @@
-import buildAuthenticationController from './authentication';
-export { buildGenerationController } from './generation';
-export { default as buildUploadProcessor } from './upload';
-import database from './db/database';
-export { GeminiImplementationController } from './llms/gemini_implementation';
+import buildAuthenticationController from './authentication.js';
+export { buildGenerationController } from './generation.js';
+export { default as buildUploadProcessor } from './upload.js';
+import database from './db/database.js';
+export { GeminiImplementationController } from './llms/gemini_implementation.js';
 export { database, buildAuthenticationController };

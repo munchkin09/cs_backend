@@ -1,5 +1,5 @@
-import { LLMProvider, IGenerationController, IConfiguration } from "../types";
-import { GeminiImplementationController } from "./llms/gemini_implementation";
+import { LLMProvider, IGenerationController, IConfiguration } from "../types/index.js";
+import { GeminiImplementationController } from "./llms/gemini_implementation.js";
 
 
 export function buildGenerationController(configuration: IConfiguration): IGenerationController {

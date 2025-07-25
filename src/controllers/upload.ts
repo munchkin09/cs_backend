@@ -5,7 +5,7 @@ import multer from 'multer';
 import { cwd } from 'process';
 import { Request } from 'express';
 import { FileFilterCallback } from 'multer';
-import { VideoCompressor, CompressionOptions } from '../utils/videoCompressor';
+import { VideoCompressor, CompressionOptions } from '../utils/videoCompressor.js';
 
 export default function buildUploadProcessor() {
     const uploadDir = path.join(cwd(), 'uploads');

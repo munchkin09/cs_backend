@@ -3,11 +3,11 @@ import { cwd } from 'process';
 import express from 'express';
 import helmet from 'helmet';
 import bodyParser from 'body-parser';
-import { IConfiguration } from './types';
-import database from './controllers/db/database';
+import { IConfiguration } from './types/index.js';
+import database from './controllers/db/database.js';
 import SwaggerUIDist from 'swagger-ui-dist';
-import { buildUserRouter , buildGenerationRouter, buildAuthRouter } from './routes/v1/';
-import { initializeFFmpeg } from './config/ffmpeg';
+import { buildUserRouter , buildGenerationRouter, buildAuthRouter } from './routes/v1/index.js';
+import { initializeFFmpeg } from './config/ffmpeg.js';
 
 // Puedes seguir importando más routers según crezcas
 const env = process.env.NODE_ENV || 'development';
