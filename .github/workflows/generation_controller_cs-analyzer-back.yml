@@ -56,7 +56,6 @@ jobs:
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_08D5E386C855403EA32C6590749D2443 }}
 
       - name: Create .env file
-        working-directory: .
         run: |
           echo "LLM_API_KEY=${{secrets.LLM_API_KEY}}" >> .env
           echo "STEAM_API_KEY=${{secrets.STEAM_API_KEY}}" >> .env
