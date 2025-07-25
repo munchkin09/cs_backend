@@ -58,13 +58,13 @@ jobs:
       - name: Create .env file
         working-directory: .
         run: |
-          echo "LLM_API_KEY=${secrets.LLM_API_KEY}" >> .env
-          echo "STEAM_API_KEY=${secrets.STEAM_API_KEY}" >> .env
-          echo "SESSION_SECRET=${secrets.SESSION_SECRET}" >> .env
-          echo "STEAM_RETURN_URL=${secrets.STEAM_RETURN_URL}" >> .env
-          echo "DOMAIN=${secrets.DOMAIN}" >> .env
-          echo "MONGODB_URI=${secrets.MONGODB_URI}" >> .env
-          echo "AZURE_COSMOS_CONNECTIONSTRING=${secrets.AZURE_COSMOS_CONNECTIONSTRING}" >> .env
+          echo "LLM_API_KEY=${{secrets.LLM_API_KEY}}" >> .env
+          echo "STEAM_API_KEY=${{secrets.STEAM_API_KEY}}" >> .env
+          echo "SESSION_SECRET=${{secrets.SESSION_SECRET}}" >> .env
+          echo "STEAM_RETURN_URL=${{secrets.STEAM_RETURN_URL}}" >> .env
+          echo "DOMAIN=${{secrets.DOMAIN}}" >> .env
+          echo "MONGODB_URI=${{secrets.MONGODB_URI}}" >> .env
+          echo "AZURE_COSMOS_CONNECTIONSTRING=${{secrets.AZURE_COSMOS_CONNECTIONSTRING}}" >> .env
           echo "NODE_ENV=production" >> .env
 
       - name: 'Deploy to Azure Web App'
