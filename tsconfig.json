@@ -14,8 +14,9 @@
     "isolatedModules": true,
     "baseUrl": ".",
     "noFallthroughCasesInSwitch": true,
-    "outDir": "./dist"
+    "outDir": "./backend"
   },
   "compileOnSave": true,
-  "include": ["."]
+  "include": ["./src/**/*", "./package.json"],
+
 }
