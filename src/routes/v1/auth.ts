@@ -1,9 +1,9 @@
 import type { Request, Response, RequestHandler, Application, Router } from "express";
 import passport from "passport";
 import session from "express-session";
-import { buildAuthenticationController } from "../../controllers";
+import { buildAuthenticationController } from "../../controllers/index.js";
 import SteamStrategy from "passport-steam";
-import type { IConfiguration } from "../../types";
+import type { IConfiguration } from "../../types/index.js";
 
 function buildAuthRouter(app: Application, configuration: IConfiguration) {
     const router = app.router;

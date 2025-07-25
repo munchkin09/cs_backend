@@ -1,5 +1,5 @@
-import type { IUserModel, IGenerationModel } from '../controllers/db/schemas';
-import { ISteamProfile } from './auth';
+import type { IUserModel, IGenerationModel } from '../controllers/db/schemas.js';
+import { ISteamProfile } from './auth.js';
 
 export interface Database {
     connect: (uri: string) => Promise<void>;
