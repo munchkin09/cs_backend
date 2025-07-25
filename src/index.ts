@@ -7,6 +7,7 @@ import { IConfiguration } from './types';
 import database from './controllers/db/database';
 import SwaggerUIDist from 'swagger-ui-dist';
 import { buildUserRouter , buildGenerationRouter, buildAuthRouter } from './routes/v1/';
+import { initializeFFmpeg } from './config/ffmpeg';
 
 // Puedes seguir importando más routers según crezcas
 const env = process.env.NODE_ENV || 'development';
@@ -58,16 +59,14 @@ app.get('/', (req, res) => {
     return;
 });
 const { router: authRouter, authMiddleware } = buildAuthRouter(app, configuration);
-app.use(authMiddleware);
 
-
+app.use('/api/v1/generation', buildGenerationRouter(app, configuration));
 app.use(authMiddleware);
 
 // Monta los routers por versión y responsabilidad
 app.use('/auth', authRouter);
 
 app.use('/api/v1/users', buildUserRouter());
-app.use('/api/v1/generation', buildGenerationRouter(app, configuration));
 
 app.use((req, res, next) => {
     // Middleware para manejar errores
@@ -75,9 +74,15 @@ app.use((req, res, next) => {
 })
 
 app.listen(PORT, async () => {
+    // Inicializar FFmpeg
+    await initializeFFmpeg();
+    
+    // Conectar a la base de datos
     await database.connect(configuration.databaseUrl, configuration.databaseName);
-    console.log(`Server running on port ${PORT}`);
-    console.log(`LLM Provider: ${configuration.llmProvider}`);
-    console.log(`Database URL: ${configuration.databaseUrl}`);
-    console.log(`Database Name: ${configuration.databaseName}`);
+    
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🤖 LLM Provider: ${configuration.llmProvider}`);
+    console.log(`🗄️  Database URL: ${configuration.databaseUrl}`);
+    console.log(`📊 Database Name: ${configuration.databaseName}`);
+    console.log(`🌍 Environment: ${configuration.environment || 'development'}`);
 });
