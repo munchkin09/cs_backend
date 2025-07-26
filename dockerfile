@@ -16,7 +16,7 @@ RUN apk add --no-cache \
 COPY package*.json ./
 
 # Install Node.js dependencies
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci && npm cache clean --force
 
 # Copy source code
 COPY src/ ./src/

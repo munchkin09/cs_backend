@@ -30,9 +30,10 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_79C92A52B792451CA64F1DC893A9B496 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_DDD4890F972A4138AFDFAA4AB99DD36B }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_08D5E386C855403EA32C6590749D2443 }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
 
       - name: Login to Azure Container Registry
         run: az acr login --name csanalyzer
@@ -59,17 +60,18 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            LLM_API_KEY=${{ secrets.LLM_API_KEY }}
             NODE_ENV=production
 
       - name: Display image details
         run: |
           echo "🐳 Docker image successfully built and pushed!"
-          echo "📦 Registry: ${{ env.REGISTRY }}"
+          echo "📦 Registry: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
           echo "🏷️  Tags: ${{ steps.meta.outputs.tags }}"
           echo ""
           echo "🚀 To deploy this image:"
           echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+          echo ""
+          echo "📋 Available tags:"
+          az acr repository show-tags --name csanalyzer --repository ${{ env.IMAGE_NAME }} --output table
 
 
-          
