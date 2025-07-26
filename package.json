@@ -17,11 +17,11 @@
     "test:coverage:watch": "jest . --coverage --watch",
     "docker:build": "docker build -t cs-backend .",
     "docker:run": "docker run -p 3000:3000 --env-file .env cs-backend",
-    "docker:dev": "docker-compose up --build",
-    "docker:prod": "docker-compose -f docker-compose.yml up -d",
-    "docker:stop": "docker-compose down",
-    "docker:logs": "docker-compose logs -f cs-backend",
-    "docker:clean": "docker-compose down -v && docker system prune -f"
+    "docker:dev": "docker compose up --build",
+    "docker:prod": "docker compose -f docker-compose.yml up -d",
+    "docker:stop": "docker compose down",
+    "docker:logs": "docker compose logs -f cs-backend",
+    "docker:clean": "docker compose down -v && docker system prune -f"
   },
   "author": "Ariadne & Munchkin",
   "license": "SEE LICENSE IN LICENSE.MD",
