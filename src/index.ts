@@ -6,8 +6,8 @@ import bodyParser from 'body-parser';
 import { IConfiguration } from './types/index.js';
 import database from './controllers/db/database.js';
 import { buildUserRouter , buildGenerationRouter, buildAuthRouter } from './routes/v1/index.js';
-import { initializeFFmpeg } from './config/ffmpeg.js';
 import buildDocsRouter from './routes/v1/docs.js';
+import { initializeFFmpeg } from './config/ffmpeg.js';
 
 // Puedes seguir importando más routers según crezcas
 const env = process.env.NODE_ENV || 'development';
