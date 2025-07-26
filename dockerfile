@@ -1,5 +1,29 @@
 # Use Node.js 22 Alpine as base image (smaller size)
-FROM node:22-alpine
+FROM node:22-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies for building
+RUN apk add --no-cache python3 make g++
+
+# Copy package files
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# Install ALL dependencies (including dev dependencies for TypeScript)
+RUN npm ci
+
+# Copy source code
+COPY src/ ./src/
+
+# Build the application
+RUN npm run build
+
+# ===============================================
+# Production stage
+# ===============================================
+FROM node:22-alpine AS production
 
 # Set working directory
 WORKDIR /app
@@ -8,22 +32,16 @@ WORKDIR /app
 RUN apk add --no-cache \
     ffmpeg \
     wget \
-    python3 \
-    make \
-    g++ \
     && rm -rf /var/cache/apk/*
 
 # Copy package files
 COPY package*.json ./
-COPY tsconfig.json ./
 
-# Copy source code
-COPY src/ ./src/
+# Install only production dependencies
+RUN npm ci --only=production && npm cache clean --force
 
-# Install Node.js dependencies and build
-RUN npm ci --only=production && \
-    npm run build && \
-    npm cache clean --force
+# Copy built application from builder stage
+COPY --from=builder /app/backend/ ./backend/
 
 # Create uploads directory
 RUN mkdir -p uploads
