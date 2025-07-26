@@ -8,13 +8,20 @@
     "enabled": false
   },
   "scripts": {
-    "start": "node .",
+    "start": "node backend/index.js",
     "dev": "npx tsx --env-file=.env src/index.ts",
     "build": "tsc --project tsconfig.json",
     "test": "jest . --runInBand",
     "test:watch": "jest . --watch",
     "test:coverage": "jest . --coverage",
-    "test:coverage:watch": "jest . --coverage --watch"
+    "test:coverage:watch": "jest . --coverage --watch",
+    "docker:build": "docker build -t cs-backend .",
+    "docker:run": "docker run -p 3000:3000 --env-file .env cs-backend",
+    "docker:dev": "docker-compose up --build",
+    "docker:prod": "docker-compose -f docker-compose.yml up -d",
+    "docker:stop": "docker-compose down",
+    "docker:logs": "docker-compose logs -f cs-backend",
+    "docker:clean": "docker-compose down -v && docker system prune -f"
   },
   "author": "Ariadne & Munchkin",
   "license": "SEE LICENSE IN LICENSE.MD",
