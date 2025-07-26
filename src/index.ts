@@ -5,9 +5,9 @@ import helmet from 'helmet';
 import bodyParser from 'body-parser';
 import { IConfiguration } from './types/index.js';
 import database from './controllers/db/database.js';
-import SwaggerUIDist from 'swagger-ui-dist';
 import { buildUserRouter , buildGenerationRouter, buildAuthRouter } from './routes/v1/index.js';
 import { initializeFFmpeg } from './config/ffmpeg.js';
+import buildDocsRouter from './routes/v1/docs.js';
 
 // Puedes seguir importando más routers según crezcas
 const env = process.env.NODE_ENV || 'development';
@@ -28,25 +28,9 @@ app.use(bodyParser.json());
 
 
 if (env === 'development') {
-
-    const swaggerUiPath = SwaggerUIDist.getAbsoluteFSPath();
-    // 1. Sirve la spec OpenAPI
-    app.get('/swagger.json', (_, res) => {
-    res.sendFile(path.join(cwd(),'swagger', 'openapi.json'));
-    });
-
-    // 2. Sirve los assets de Swagger UI
-    app.use('/docs-assets', express.static(swaggerUiPath));
-
-    // 3. Sirve el HTML y JS de la carpeta public/docs
-    app.use('/docs', express.static(path.join(cwd(), 'docs')));
-
-    // Endpoint raíz
-    app.use(express.static(path.join(cwd(), 'static')))
-
-    app.get('/', (req, res) => {
-        res.sendFile(path.join(cwd(), 'static', 'index.html'));
-    });
+    const docsRouter = buildDocsRouter(app);
+    app.use('/api/v1/docs', docsRouter);
+    
 }
 
 // Servir archivos estáticos ANTES del middleware de autenticación
