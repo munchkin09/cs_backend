@@ -29,6 +29,8 @@ jobs:
           npm run test --if-present
           npm run build --if-present
           cp ./static/* ./backend/ # Copy static files to backend directory
+          cd ./backend
+          npm install --omit=dev
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
