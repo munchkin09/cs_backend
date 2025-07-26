@@ -20,6 +20,6 @@
     "noImplicitThis": false
   },
   "compileOnSave": true,
-  "include": ["./src/**/*", "./package.json"],
-  "exclude": ["node_modules", "backend", "dist"]
+  "include": ["./src/**/*", "./package.json", "node_modules"],
+  "exclude": [, "backend", "dist"]
 }
