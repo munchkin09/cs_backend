@@ -21,5 +21,5 @@
   },
   "compileOnSave": true,
   "include": ["./src/**/*", "./package.json", "node_modules"],
-  "exclude": [, "backend", "dist"]
+  "exclude": ["backend", "dist"]
 }
