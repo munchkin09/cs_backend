@@ -18,10 +18,10 @@ jobs:
       - name: 🦾 Install Azure Developer CLI
         run: |
           curl -fsSL https://aka.ms/install-azd.sh | bash
-      - name: 🔑 Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: 🔑 Azure Developer CLI Login
+        run: |
+          echo '${{ secrets.AZURE_CREDENTIALS }}' > azure-credentials.json
+          azd auth login --credentials azure-credentials.json
       - name: 🚀 Deploy with azd
         run: |
           azd provision --preview
