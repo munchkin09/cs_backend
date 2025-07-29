@@ -26,7 +26,7 @@ jobs:
         run: azd auth login --client-id ${{ secrets.AZURE_CLIENT_ID }} --client-secret ${{ secrets.AZURE_CLIENT_SECRET }} --tenant-id ${{ secrets.AZURE_TENANT_ID }}
       - name: 🚀 Deploy with azd
         run: |
-          azd provision --preview
-          azd up
+          azd provision --environment prod --preview
+          azd up --environment prod
       - name: 📋 Show logs
-        run: azd logs
+        run: azd logs --environment prod
