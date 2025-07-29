@@ -68,4 +68,6 @@ app.listen(PORT, async () => {
     console.log(`🗄️  Database URL: ${configuration.dbConnectionString}`);
     console.log(`📊 Database Name: CSAnalyzer`);
     console.log(`🌍 Environment: ${configuration.environment || 'development'}`);
+    console.log(`📄 Documentation available at: http://localhost:${PORT}/api/v1/docs`);
+    console.log(`🔗 Auth endpoint: http://localhost:${PORT}/auth`);
 });
