@@ -32,9 +32,14 @@ jobs:
       - name: 🏗️ Build app
         run: |
           npm run build
-          cp ./static ./backend/*
-          cp package.json ./backend/
-          cp package-lock.json ./backend/
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            powershell Copy-Item -Path ./static -Destination ./backend -Recurse
+            powershell Copy-Item -Path package.json -Destination ./backend/
+            powershell Copy-Item -Path package-lock.json -Destination ./backend/
+          else
+            cp ./static ./backend/*
+            cp package.json ./backend/
+            cp package-lock.json ./backend/
 
       - name: 📤 Upload artifact for deployment job
         uses: actions/upload-artifact@v4
