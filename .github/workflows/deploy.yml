@@ -18,7 +18,6 @@ jobs:
       - name: 🦾 Install Azure Developer CLI
         run: |
           curl -fsSL https://aka.ms/install-azd.sh | bash
-          azd --version
       - name: 🔑 Azure Login
         uses: azure/login@v1
         with:
