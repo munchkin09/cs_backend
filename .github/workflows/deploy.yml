@@ -2,7 +2,7 @@ name: 🚀 Deploy to Azure App Service
 on:
   push:
     branches:
-      - GenerationController
+      - Generation_Controller
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
