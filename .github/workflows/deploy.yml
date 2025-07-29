@@ -15,8 +15,10 @@ jobs:
           node-version: '22.x'
       - name: 🛠️ Install dependencies
         run: npm install
-      - name: 🦾 Set up Azure Developer CLI
-        uses: Azure/setup-azd@v1
+      - name: 🦾 Install Azure Developer CLI
+        run: |
+          curl -fsSL https://aka.ms/install-azd.sh | bash
+          azd --version
       - name: 🔑 Azure Login
         uses: azure/login@v1
         with:
