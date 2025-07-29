@@ -1,0 +1,8 @@
+name: cs-backend
+infra:
+  provider: bicep
+services:
+  cs-backend:
+    project: src
+    host: appservice
+    language: ts

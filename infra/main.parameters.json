@@ -1,0 +1,11 @@
+{
+  "environmentName": "${AZURE_ENV_NAME}",
+  "location": "${AZURE_LOCATION}",
+  "resourceGroupName": "rg-${AZURE_ENV_NAME}",
+  "NODE_ENV": "production",
+  "PORT": "3000",
+  "LLM_PROVIDER": "gemini",
+  "LLM_API_KEY": "${LLM_API_KEY}",
+  "MONGODB_URI": "mongodb://mongodb:27017",
+  "MONGODB_NAME": "csanalyzer"
+}
