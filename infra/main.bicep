@@ -8,6 +8,7 @@ param LLM_PROVIDER string
 param LLM_API_KEY string
 param MONGODB_URI string
 param MONGODB_NAME string
+param STEAM_API_KEY string
 
 var resourcePrefix = 'cs'
 var resourceToken = uniqueString(subscription().id, resourceGroup().id, location, environmentName)
@@ -24,23 +25,25 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
 resource appService 'Microsoft.Web/sites@2022-03-01' = {
   name: 'az-${resourcePrefix}-${resourceToken}-web'
   location: location
-  serverFarmId: appServicePlan.id
   identity: {
-    type: 'UserAssigned'
-    userAssignedIdentities: {}
+    type: 'SystemAssigned'
   }
-  siteConfig: {
-    cors: {
-      allowedOrigins: ['*']
+  properties: {
+    serverFarmId: appServicePlan.id
+    siteConfig: {
+      cors: {
+        allowedOrigins: ['*']
+      }
+      appSettings: [
+        { name: 'NODE_ENV', value: NODE_ENV }
+        { name: 'PORT', value: PORT }
+        { name: 'LLM_PROVIDER', value: LLM_PROVIDER }
+        { name: 'LLM_API_KEY', value: LLM_API_KEY }
+        { name: 'STEAM_API_KEY', value: STEAM_API_KEY }
+        { name: 'MONGODB_URI', value: MONGODB_URI }
+        { name: 'MONGODB_NAME', value: MONGODB_NAME }
+      ]
     }
-    appSettings: [
-      { name: 'NODE_ENV', value: NODE_ENV },
-      { name: 'PORT', value: PORT },
-      { name: 'LLM_PROVIDER', value: LLM_PROVIDER },
-      { name: 'LLM_API_KEY', value: LLM_API_KEY },
-      { name: 'MONGODB_URI', value: MONGODB_URI },
-      { name: 'MONGODB_NAME', value: MONGODB_NAME }
-    ]
   }
   tags: {
     'azd-service-name': 'cs-backend'
@@ -60,7 +63,6 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: 'az-${resourcePrefix}-${resourceToken}-ai'
   location: location
   kind: 'web'
-  applicationType: 'web'
 }
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' = {
