@@ -28,12 +28,11 @@ npm run build
 
 ### **Docker (Recommended)**
 ```bash
-# Build and run with Docker Compose
-npm run docker:build
-npm run docker:up
+# Build image
+docker build -t cs-backend .
 
-# Stop containers
-npm run docker:down
+# Run locally
+docker run -p 3000:3000 cs-backend
 ```
 
 ### **Azure Container Registry**
@@ -43,6 +42,11 @@ docker pull csanalyzer.azurecr.io/cs-backend:latest
 
 # Run from registry
 docker run -p 3000:3000 csanalyzer.azurecr.io/cs-backend:latest
+
+# Push your build
+az acr login --name <ACR_NAME>
+docker tag cs-backend <ACR_NAME>.azurecr.io/cs-backend:latest
+docker push <ACR_NAME>.azurecr.io/cs-backend:latest
 ```
 
 ## 📚 Documentation
