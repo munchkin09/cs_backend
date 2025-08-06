@@ -14,6 +14,11 @@ RUN npm run build
 
 # Stage 2: producción
 FROM node:22-alpine AS production
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
 # Instala solo FFmpeg runtime
 RUN apk add --no-cache ffmpeg
 
@@ -26,13 +31,19 @@ ARG DOMAIN
 ARG MONGODB_URI
 
 WORKDIR /app
+COPY --from=builder /build/package*.json ./
 COPY --from=builder /build/backend ./backend
-COPY --from=builder /build/package.json ./package.json
 COPY --from=builder /build/static ./static
 
-RUN npm install --production
 
-EXPOSE 3000
+# Install only production dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Change ownership to nodejs user
+RUN chown -R nodejs:nodejs /app
+USER nodejs
+
+
 
 # Configurar las variables de entorno desde los argumentos de build
 ENV LLM_API_KEY=${LLM_API_KEY}
@@ -42,5 +53,7 @@ ENV STEAM_RETURN_URL=${STEAM_RETURN_URL}
 ENV DOMAIN=${DOMAIN}
 ENV MONGODB_URI=${MONGODB_URI}
 ENV NODE_ENV="production"
+
+EXPOSE 3000
 
 CMD ["node", "backend/src/index.js"]
