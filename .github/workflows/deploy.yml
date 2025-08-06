@@ -5,11 +5,12 @@ on:
     branches:
       - main
       - master
-      - Generation_Controller
+      - main/Generation_Controller
   pull_request:
     branches:
       - main
       - master
+      - develop
 
 env:
   REGISTRY_NAME: csanalyzercontainerregistry.azurecr.io
