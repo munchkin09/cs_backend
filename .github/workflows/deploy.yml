@@ -1,0 +1,65 @@
+name: Deploy to Azure Container Registry
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - Generation_Controller
+  pull_request:
+    branches:
+      - main
+      - master
+
+env:
+  REGISTRY_NAME: csanalyzercontainerregistry.azurecr.io
+  IMAGE_NAME: cs-backend
+  IMAGE_TAG: latest
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run tests
+      run: npm test
+
+  build-and-deploy:
+    name: Build and Deploy to ACR
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Azure CLI Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+    - name: Build and push Docker image to ACR
+      run: |
+        az acr build \
+          --registry csanalyzercontainerregistry \
+          --image ${{ env.IMAGE_NAME }}:${{ github.sha }} \
+          --file Dockerfile \
+          .
+          
+    - name: Logout from Azure
+      run: az logout
+      if: always()

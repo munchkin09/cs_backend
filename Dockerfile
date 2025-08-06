@@ -1,25 +1,29 @@
-FROM node:22-alpine
+FROM node:22-alpine AS builder
 
-# Install ffmpeg
-RUN apk add --no-cache ffmpeg
 
 # Create app directory
-WORKDIR /app
+WORKDIR /build
 
-# Copy package.json and lock file
-COPY package*.json ./
+COPY . .
 
 # Install dependencies
-RUN npm install --production=false
-
-# Copy source code
-COPY . .
+RUN npm install
 
 # Build the project
 RUN npm run build
 
-# Expose application port
+# Stage 2: producción
+FROM node:22-alpine AS production
+# Instala solo FFmpeg runtime
+RUN apk add --no-cache ffmpeg
+
+WORKDIR /app
+COPY --from=builder /build/backend ./backend
+COPY --from=builder /build/.env .env
+COPY --from=builder /build/static ./static
+
+RUN npm install --production
+
 EXPOSE 3000
 
-# Start the server
-CMD ["node", "backend/index.js"]
+CMD ["node", "--env-file=.env","backend/src/index.js"]
