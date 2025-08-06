@@ -1,11 +1,11 @@
-import type { IUser, IGeneration } from '../controllers/db/schemas';
-import { ISteamProfile } from './auth';
+import type { IUserModel, IGenerationModel } from '../controllers/db/schemas.js';
+import { ISteamProfile } from './auth.js';
 
 export interface Database {
     connect: (uri: string) => Promise<void>;
     disconnect: () => Promise<void>;
-    getUserBySteamId: (steamId: string) => Promise<IUser | null>;
-    createOrUpdateUser: (userData: ISteamProfile) => Promise<IUser>;
-    createGeneration: (generationData: IGeneration) => Promise<IGeneration>;
-    getGenerationsBySteamId: (steamId: string) => Promise<IGeneration[]>;
+    getUserBySteamId: (steamId: string) => Promise<IUserModel | null>;
+    createOrUpdateUser: (userData: ISteamProfile) => Promise<IUserModel>;
+    createGeneration: (generationData: IGenerationModel) => Promise<IGenerationModel>;
+    getGenerationsBySteamId: (steamId: string) => Promise<IGenerationModel[]>;
 }

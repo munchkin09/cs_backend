@@ -1,8 +1,8 @@
-import type { Database, ISteamProfile } from "../types";
+import type { Database, ISteamProfile } from "../../types/index.js";
 
 import mongoose from "mongoose";
-import { User, Generation } from "./db/schemas";
-import type { IUser, IGeneration } from "./db/schemas";
+import { User, Generation } from "./schemas.js";
+import type { IUserModel, IGenerationModel } from "./schemas.js";
 
 const database: Database = {
     connect: async (uri: string) => {
@@ -23,7 +23,7 @@ const database: Database = {
             throw error;
         }
     },
-    getUserBySteamId: async (steamId: string): Promise<IUser | null> => {
+    getUserBySteamId: async (steamId: string): Promise<IUserModel | null> => {
         try {
             const user = await User.findOne({
                 steamId: steamId
@@ -34,7 +34,7 @@ const database: Database = {
             throw error;
         }
     },
-    createOrUpdateUser: async (userData: ISteamProfile): Promise<IUser> => {
+    createOrUpdateUser: async (userData: ISteamProfile): Promise<IUserModel> => {
         try {
             const user = await User.findOneAndUpdate(
                 { steamId: userData.id },
@@ -50,7 +50,7 @@ const database: Database = {
             throw error;
         }
     },
-    createGeneration: async (generationData: IGeneration): Promise<IGeneration> => {
+    createGeneration: async (generationData: IGenerationModel): Promise<IGenerationModel> => {
         try {
             const generation = new Generation({
                 steamId: generationData.steamId,
@@ -63,9 +63,8 @@ const database: Database = {
             console.error("Error creating generation:", error);
             throw error;
         }
-    }
-    ,
-    getGenerationsBySteamId: async (steamId: string): Promise<IGeneration[]> => {
+    },
+    getGenerationsBySteamId: async (steamId: string): Promise<IGenerationModel[]> => {
         try {
             const generations = await Generation.find({
                 steamId: steamId

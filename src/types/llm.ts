@@ -1,21 +1,9 @@
 export interface LLMProvider {
-    generateText(pathToVideo: string, options?: LLMGenerateOptions): Promise<LLMResponse>;
-}
-
-export interface LLMGenerateOptions {
-    model?: string;
-    temperature?: number;
-    maxTokens?: number;
-    stopSequences?: string[];
-    [key: string]: any;
+    generateText(pathToVideo: string): Promise<LLMResponse>;
 }
 
 export interface LLMResponse {
+    jobId?: string;
     text: string;
-    usage?: {
-        promptTokens?: number;
-        completionTokens?: number;
-        totalTokens?: number;
-    };
     rawResponse?: any;
 }
