@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - master
-      - main/Generation_Controller
+      - Generation_Controller
   pull_request:
     branches:
       - main
@@ -42,7 +42,7 @@ jobs:
     name: 🐳 Build and Deploy to ACR
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/Generation_Controller')
     
     steps:
     - name: 📥 Checkout code
