@@ -1,16 +1,12 @@
 name: 🚀 Deploy to Azure Container Registry
 
-on:
+on: 
   push:
     branches:
       - main
-      - master
+      - develop
 
-  pull_request:
-    branches:
-      - main
-      - master
-
+    
 env:
   REGISTRY_NAME: csanalyzercontainerregistry
   IMAGE_NAME: cs-backend
@@ -41,7 +37,7 @@ jobs:
     name: 🐳 Build and Deploy to ACR
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/Generation_Controller')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
 
     steps:
       - name: 📥 Checkout code
