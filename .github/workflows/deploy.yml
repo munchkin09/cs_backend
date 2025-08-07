@@ -48,11 +48,18 @@ jobs:
       - name: 🏗️ Build and push Docker image to ACR
         shell: bash
         run: |
+          echo "Building Docker image with the following arguments:"
+          echo "${{ secrets.LLM_API_KEY }}" \
+                "${{ secrets.STEAM_API_KEY }}" \
+                "${{ secrets.SESSION_SECRET }}" \
+                "${{ secrets.STEAM_RETURN_URL }}" \
+                "${{ secrets.DOMAIN }}" \
+                "${{ secrets.MONGODB_URI }}"
           az acr build \
             --file Dockerfile_deploy \
-            --registry "${{ env.REGISTRY_NAME }}" \
-            --image "${{ env.IMAGE_NAME }}:${{ github.sha }}" \
-            --image "${{ env.IMAGE_NAME }}:latest" \
+            --registry ${{ env.REGISTRY_NAME }} \
+            --image ${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --image ${{ env.IMAGE_NAME }}:latest \
             --build-arg LLM_API_KEY="${{ secrets.LLM_API_KEY }}" \
             --build-arg STEAM_API_KEY="${{ secrets.STEAM_API_KEY }}" \
             --build-arg SESSION_SECRET="${{ secrets.SESSION_SECRET }}" \
