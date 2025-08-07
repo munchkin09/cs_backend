@@ -62,8 +62,7 @@ jobs:
             --build-arg SESSION_SECRET="${{ secrets.SESSION_SECRET }}" \
             --build-arg STEAM_RETURN_URL="${{ secrets.STEAM_RETURN_URL }}" \
             --build-arg DOMAIN="${{ secrets.DOMAIN }}" \
-            --build-arg MONGODB_URI="${{ secrets.MONGODB_URI }}" \
-            .
+            --build-arg MONGODB_URI="${{ secrets.MONGODB_URI }}" .
 
       - name: 🏷️ Verify image in ACR
         run: |
