@@ -28,7 +28,6 @@ jobs:
       - name: 📋 Verify Azure login
         run: |
           az acr login --name ${{ env.REGISTRY_NAME }}
-          ls -lah
           az account show
 
       #- name: 🏗️ Build and push Docker image to ACR
@@ -60,7 +59,6 @@ jobs:
             --build-arg STEAM_RETURN_URL=${{ secrets.STEAM_RETURN_URL }} \
             --build-arg DOMAIN=${{ secrets.DOMAIN }} \
             --build-arg MONGODB_URI=${{ secrets.MONGODB_URI }} \
-            --verbose \
             .
 
       - name: 👋 Logout from Azure
