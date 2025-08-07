@@ -47,21 +47,20 @@ jobs:
       
             # 4. Build the Docker image
       - name: 🏗️ Build and push Docker image to ACR
+        shell: bash
         run: |
-          ls -lah
-          az acr build \
+          az acr build . \
             --file Dockerfile_deploy \
             --registry ${{ env.REGISTRY_NAME }} \
             --image ${{ env.IMAGE_NAME }}:${{ github.sha }} \
             --image ${{ env.IMAGE_NAME }}:latest \
-            --build-arg LLM_API_KEY="${{ secrets.LLM_API_KEY }}" \
-            --build-arg STEAM_API_KEY="${{ secrets.STEAM_API_KEY }}" \
-            --build-arg SESSION_SECRET="${{ secrets.SESSION_SECRET }}" \
-            --build-arg STEAM_RETURN_URL="${{ secrets.STEAM_RETURN_URL }}" \
-            --build-arg DOMAIN="${{ secrets.DOMAIN }}" \
-            --build-arg MONGODB_URI="${{ secrets.MONGODB_URI }}" \
+            --build-arg LLM_API_KEY=${{ secrets.LLM_API_KEY }} \
+            --build-arg STEAM_API_KEY=${{ secrets.STEAM_API_KEY }} \
+            --build-arg SESSION_SECRET=${{ secrets.SESSION_SECRET }} \
+            --build-arg STEAM_RETURN_URL=${{ secrets.STEAM_RETURN_URL }} \
+            --build-arg DOMAIN=${{ secrets.DOMAIN }} \
+            --build-arg MONGODB_URI=${{ secrets.MONGODB_URI }} \
             --verbose \
-            .
 
       - name: 👋 Logout from Azure
         run: az logout
