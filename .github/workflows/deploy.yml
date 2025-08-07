@@ -29,21 +29,6 @@ jobs:
           az acr login --name ${{ env.REGISTRY_NAME }}
           az account show
 
-      #- name: 🏗️ Build and push Docker image to ACR
-        #run: |
-          #az acr build . \
-            #--registry ${{ env.REGISTRY_NAME }} \
-            #--image ${{ env.IMAGE_NAME }}:latest \
-            #--file Dockerfile_deploy \
-            #--timeout 3600 \
-            #--build-arg LLM_API_KEY="${{ secrets.LLM_API_KEY }}" \
-            #--build-arg STEAM_API_KEY="${{ secrets.STEAM_API_KEY }}" \
-            #--build-arg SESSION_SECRET="${{ secrets.SESSION_SECRET }}" \
-            #--build-arg STEAM_RETURN_URL="${{ secrets.STEAM_RETURN_URL }}" \
-            #--build-arg DOMAIN="${{ secrets.DOMAIN }}" \
-            #--build-arg MONGODB_URI="${{ secrets.MONGODB_URI }}"
-      
-            # 4. Build the Docker image
       - name: 🏗️ Build and push Docker image to ACR
         shell: bash
         run: |
