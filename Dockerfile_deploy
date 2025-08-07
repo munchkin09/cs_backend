@@ -1,13 +1,11 @@
 FROM node:22-alpine AS builder
-
-
 # Create app directory
 WORKDIR /build
 
 COPY . .
 
 # Install dependencies
-RUN npm install
+RUN npm ci --include=dev --verbose
 
 # Build the project
 RUN npm run build
@@ -54,7 +52,7 @@ ENV SESSION_SECRET=${SESSION_SECRET}
 ENV STEAM_RETURN_URL=${STEAM_RETURN_URL}
 ENV DOMAIN=${DOMAIN}
 ENV MONGODB_URI=${MONGODB_URI}
-ENV NODE_ENV="production"
+ENV NODE_ENV="development"
 
 EXPOSE 3000
 
