@@ -45,24 +45,20 @@ jobs:
             # 4. Build the Docker image
       - name: Build Docker image
         run: |
-          docker build \
+          az acr login --name ${{ env.REGISTRY_NAME }}
+          az acr build \
             --file Dockerfile_deploy \
+            --registry ${{ env.REGISTRY_NAME }} \
+            --image ${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --image ${{ env.IMAGE_NAME }}:latest \
             --build-arg LLM_API_KEY="${{ secrets.LLM_API_KEY }}" \
             --build-arg STEAM_API_KEY="${{ secrets.STEAM_API_KEY }}" \
             --build-arg SESSION_SECRET="${{ secrets.SESSION_SECRET }}" \
             --build-arg STEAM_RETURN_URL="${{ secrets.STEAM_RETURN_URL }}" \
             --build-arg DOMAIN="${{ secrets.DOMAIN }}" \
             --build-arg MONGODB_URI="${{ secrets.MONGODB_URI }}" \
-            -t csanalyzercontainerregistry.azurecr.io/cs-backend:latest \
+            --verbose \
             .
-
-      # 5. Push the image to ACR
-      - name: Push Docker image
-        run: |
-          docker push csanalyzercontainerregistry.azurecr.io/cs-backend:latest
-      - name: 🏷️ Verify image in ACR
-        run: |
-          az acr repository show --name ${{ env.REGISTRY_NAME }} --image ${{ env.IMAGE_NAME }}:latest
 
       - name: 👋 Logout from Azure
         run: az logout
