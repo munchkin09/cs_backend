@@ -1,0 +1,49 @@
+# Git
+.git
+.gitignore
+
+# Node modules
+node_modules
+npm-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+
+# Logs
+logs
+*.log
+
+# Coverage directory used by tools like istanbul
+coverage
+
+# Dependency directories
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# IDE files
+.vscode
+.idea
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp
+temp
+
+# Documentation
+*.md
+docs/
+
+# Docker files (not needed inside container)
+Dockerfile*
+docker-compose*
+
+# CI/CD files
+.github/
