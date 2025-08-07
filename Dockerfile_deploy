@@ -9,11 +9,9 @@ COPY package*.json ./
 RUN npm ci --include=dev --verbose
 
 # Copy only necessary source files (avoid problematic files)
-COPY backend/ ./backend/
-COPY static/ ./static/
-COPY *.js ./
-COPY *.json ./
-
+COPY ./src/ ./src/
+COPY ./static/ ./static/
+COPY ./tsconfig.json ./
 
 RUN set -e && \
     echo "Starting build process..." && \
