@@ -39,7 +39,7 @@ COPY --from=builder /build/static ./static
 
 
 # Install only production dependencies
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --include=dev --verbose && npm cache clean --force
 
 # Change ownership to nodejs user
 RUN chown -R nodejs:nodejs /app
