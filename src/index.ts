@@ -57,17 +57,17 @@ app.use((req, res, next) => {
 })
 
 app.listen(PORT, async () => {
+    console.log(`🌍 Environment: ${configuration.environment || 'fault'}`);
     // Inicializar FFmpeg
     await initializeFFmpeg();
     
     // Conectar a la base de datos
     await database.connect(configuration.dbConnectionString);
     
-    console.log(`🚀 Server running on port ${PORT}`);
+    
     console.log(`🤖 LLM Provider: ${configuration.llmProvider}`);
     console.log(`🗄️  Database URL: ${configuration.dbConnectionString}`);
     console.log(`📊 Database Name: CSAnalyzer`);
-    console.log(`🌍 Environment: ${configuration.environment || 'development'}`);
-    console.log(`📄 Documentation available at: http://localhost:${PORT}/api/v1/docs`);
-    console.log(`🔗 Auth endpoint: http://localhost:${PORT}/auth`);
+
+    console.log(`🚀 Server running on port ${PORT}`);
 });

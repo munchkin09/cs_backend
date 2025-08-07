@@ -14,7 +14,6 @@ services:
       MONGO_INITDB_DATABASE: csanalyzer
     volumes:
       - mongodb_data:/data/db
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     networks:
       - csanalyzer-network
     healthcheck:
@@ -35,8 +34,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=production
-      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/csanalyzer?authSource=admin
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://@mongodb:27017/csanalyzer?authSource=admin
       - PORT=3000
     volumes:
       - ./uploads:/app/uploads
