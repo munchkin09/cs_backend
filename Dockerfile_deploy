@@ -65,9 +65,9 @@ EXPOSE 3000
 
 
 # Redirect stdout and stderr to log files in a persistent volume
-VOLUME ["/app/logs"]
-ENV LOG_STDOUT="/app/logs/stdout.log"
-ENV LOG_STDERR="/app/logs/stderr.log"
+VOLUME ["$HOME/logs"]
+ENV LOG_STDOUT="/logs/stdout.log"
+ENV LOG_STDERR="/logs/stderr.log"
 
 # Use dumb-init for proper signal handling
 ENTRYPOINT ["dumb-init", "--", "sh", "-c", "node backend/src/index.js >$LOG_STDOUT 2>$LOG_STDERR"]
