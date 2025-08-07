@@ -26,7 +26,10 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: 📋 Verify Azure login
-        run: az account show
+        run: |
+          az acr login --name ${{ env.REGISTRY_NAME }}
+          ls -lah
+          az account show
 
       #- name: 🏗️ Build and push Docker image to ACR
         #run: |
@@ -43,9 +46,9 @@ jobs:
             #--build-arg MONGODB_URI="${{ secrets.MONGODB_URI }}"
       
             # 4. Build the Docker image
-      - name: Build Docker image
+      - name: 🏗️ Build and push Docker image to ACR
         run: |
-          az acr login --name ${{ env.REGISTRY_NAME }}
+          ls -lah
           az acr build \
             --file Dockerfile_deploy \
             --registry ${{ env.REGISTRY_NAME }} \
