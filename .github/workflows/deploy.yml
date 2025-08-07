@@ -1,0 +1,78 @@
+name: 🚀 Deploy to Azure Container Registry
+
+on: 
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY_NAME: csanalyzercontainerregistry
+  IMAGE_NAME: cs-backend
+
+jobs:
+  build-and-deploy:
+    name: 🐳 Build and Deploy to ACR
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Azure CLI Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: 📋 Verify Azure login
+        run: |
+          az acr login --name ${{ env.REGISTRY_NAME }}
+          az account show
+
+      #- name: 🏗️ Build and push Docker image to ACR
+        #run: |
+          #az acr build . \
+            #--registry ${{ env.REGISTRY_NAME }} \
+            #--image ${{ env.IMAGE_NAME }}:latest \
+            #--file Dockerfile_deploy \
+            #--timeout 3600 \
+            #--build-arg LLM_API_KEY="${{ secrets.LLM_API_KEY }}" \
+            #--build-arg STEAM_API_KEY="${{ secrets.STEAM_API_KEY }}" \
+            #--build-arg SESSION_SECRET="${{ secrets.SESSION_SECRET }}" \
+            #--build-arg STEAM_RETURN_URL="${{ secrets.STEAM_RETURN_URL }}" \
+            #--build-arg DOMAIN="${{ secrets.DOMAIN }}" \
+            #--build-arg MONGODB_URI="${{ secrets.MONGODB_URI }}"
+      
+            # 4. Build the Docker image
+      - name: 🏗️ Build and push Docker image to ACR
+        shell: bash
+        run: |
+          echo "Building Docker image with the following arguments:"
+          az acr build \
+            --file Dockerfile_deploy \
+            --registry ${{ env.REGISTRY_NAME }} \
+            --image ${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --image ${{ env.IMAGE_NAME }}:latest \
+            --timeout 3600 \
+            --build-arg LLM_API_KEY="'${{ secrets.LLM_API_KEY }}'" \
+            --build-arg STEAM_API_KEY="'${{ secrets.STEAM_API_KEY }}'" \
+            --build-arg SESSION_SECRET="'${{ secrets.SESSION_SECRET }}'" \
+            --build-arg STEAM_RETURN_URL="'${{ secrets.STEAM_RETURN_URL }}'" \
+            --build-arg DOMAIN="'${{ secrets.DOMAIN }}'" \
+            --build-arg MONGODB_URI="'${{ secrets.MONGODB_URI }}'" \
+            --build-arg AZURE_COSMOS_CONNECTIONSTRING="'${{ secrets.AZURE_COSMOS_CONNECTIONSTRING }}'" \
+            .
+
+      - name: 👋 Logout from Azure
+        run: az logout
+        if: always()
+  
+  farewell:
+    name: 👋 Farewell
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+    if: always()
+
+    steps:
+      - name: 📝 Log farewell message
+        run: echo "🤖 Deployment completed successfully. Goodbye! 🤖"
