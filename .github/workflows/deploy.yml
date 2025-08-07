@@ -61,6 +61,7 @@ jobs:
             --build-arg STEAM_RETURN_URL="'${{ secrets.STEAM_RETURN_URL }}'" \
             --build-arg DOMAIN="'${{ secrets.DOMAIN }}'" \
             --build-arg MONGODB_URI="'${{ secrets.MONGODB_URI }}'" \
+            --build-arg AZURE_COSMOS_CONNECTIONSTRING="'${{ secrets.AZURE_COSMOS_CONNECTIONSTRING }}'" \
             .
 
       - name: 👋 Logout from Azure
