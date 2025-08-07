@@ -49,7 +49,7 @@ jobs:
       - name: 🏗️ Build and push Docker image to ACR
         shell: bash
         run: |
-          az acr build . \
+          az acr build \
             --file Dockerfile_deploy \
             --registry ${{ env.REGISTRY_NAME }} \
             --image ${{ env.IMAGE_NAME }}:${{ github.sha }} \
@@ -61,6 +61,7 @@ jobs:
             --build-arg DOMAIN=${{ secrets.DOMAIN }} \
             --build-arg MONGODB_URI=${{ secrets.MONGODB_URI }} \
             --verbose \
+            .
 
       - name: 👋 Logout from Azure
         run: az logout
