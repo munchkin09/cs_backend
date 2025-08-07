@@ -54,7 +54,6 @@ jobs:
             --registry ${{ env.REGISTRY_NAME }} \
             --image ${{ env.IMAGE_NAME }}:${{ github.sha }} \
             --image ${{ env.IMAGE_NAME }}:latest \
-                        #--file Dockerfile_deploy \
             --timeout 3600 \
             --build-arg LLM_API_KEY="'${{ secrets.LLM_API_KEY }}'" \
             --build-arg STEAM_API_KEY="'${{ secrets.STEAM_API_KEY }}'" \
