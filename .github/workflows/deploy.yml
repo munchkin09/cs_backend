@@ -53,7 +53,6 @@ jobs:
         run: |
           az acr build \
             --registry ${{ env.REGISTRY_NAME }} \
-            --image ${{ env.IMAGE_NAME }}:${{ github.sha }} \
             --image ${{ env.IMAGE_NAME }}:latest \
             --file Dockerfile_deploy \
             --timeout 3600 \

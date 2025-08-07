@@ -7,8 +7,10 @@ COPY . .
 # Install dependencies
 RUN npm ci --include=dev --verbose
 
-# Build the project
-RUN npm run build
+RUN set -e && \
+    echo "Starting build process..." && \
+    npm run build && \
+    echo "Build completed successfully"
 
 # Stage 2: producción
 FROM node:22-alpine AS production
