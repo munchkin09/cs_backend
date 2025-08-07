@@ -19,8 +19,6 @@ jobs:
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
-        with:
-            ref: develop
 
       - name: 🔐 Azure CLI Login
         uses: azure/login@v2
@@ -32,7 +30,18 @@ jobs:
 
       - name: 🏗️ Build and push Docker image to ACR
         run: |
-          az acr build \
+          echo az acr build \
+            --registry ${{ env.REGISTRY_NAME }} \
+            --image ${{ env.IMAGE_NAME }}:latest \
+            --file Dockerfile_deploy \
+            --timeout 3600 \
+            --build-arg LLM_API_KEY="${{ secrets.LLM_API_KEY }}" \
+            --build-arg STEAM_API_KEY="${{ secrets.STEAM_API_KEY }}" \
+            --build-arg SESSION_SECRET="${{ secrets.SESSION_SECRET }}" \
+            --build-arg STEAM_RETURN_URL="${{ secrets.STEAM_RETURN_URL }}" \
+            --build-arg DOMAIN="${{ secrets.DOMAIN }}" \
+            --build-arg MONGODB_URI="${{ secrets.MONGODB_URI }}" . && \
+          echo az acr build \
             --registry ${{ env.REGISTRY_NAME }} \
             --image ${{ env.IMAGE_NAME }}:latest \
             --file Dockerfile_deploy \
@@ -54,6 +63,7 @@ jobs:
   farewell:
     name: 👋 Farewell
     runs-on: ubuntu-latest
+    needs: build-and-deploy
     if: always()
 
     steps:
