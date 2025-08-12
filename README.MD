@@ -1,356 +1,212 @@
 # 🎮 CS Analyzer Backend
 
-## Description
-AI-powered video analysis system for Counter-Strike gameplay using Gemini LLM with FFmpeg video compression and Docker containerization.
+Backend en Node.js/TypeScript para analizar partidas de Counter‑Strike usando Gemini, con subida de vídeos, compresión vía FFmpeg y autenticación con Steam.
 
-## Version
+## Versión
 0.0.1
 
-## Author
+## Autoría
 Ariadne & Munchkin
 
-## License
+## Licencia
 SEE LICENSE IN LICENSE.MD
 
-## 🚀 Quick Start
+## 🚀 Puesta en marcha
 
-### **Local Development**
+### Desarrollo local
 ```bash
-# Install dependencies
+# Instalar dependencias
 npm install
 
-# Start development server
+# Arrancar en modo desarrollo (tsx + .env)
 npm run dev
 
-# Build for production
+# Compilar a JavaScript (salida en ./backend)
 npm run build
+
+# Ejecutar compilado
+npm start
 ```
 
-### **Docker (Recommended)**
+### Docker (opcional)
 ```bash
-# Build image
+# Construir imagen
 docker build -t cs-backend .
 
-# Run locally
+# Ejecutar (recuerda pasar variables de entorno necesarias)
 docker run -p 3000:3000 cs-backend
 ```
 
-### **Azure Container Registry**
+### Azure Container Registry (opcional)
 ```bash
-# Pull from registry
+# Pull de la última imagen
 docker pull csanalyzer.azurecr.io/cs-backend:latest
 
-# Run from registry
+# Ejecutar la imagen del registro
 docker run -p 3000:3000 csanalyzer.azurecr.io/cs-backend:latest
 
-# Push your build
+# Publicar tu build
 az acr login --name <ACR_NAME>
 docker tag cs-backend <ACR_NAME>.azurecr.io/cs-backend:latest
 docker push <ACR_NAME>.azurecr.io/cs-backend:latest
 ```
 
-## 📚 Documentation
+## 📚 Documentación
 
-- 🐳 **[Docker Setup](DOCKER_README.md)** - Complete Docker configuration guide
-- 📽️ **[FFmpeg Setup](FFMPEG_SETUP.md)** - Video compression system
-- ☁️ **[Container Registry](CONTAINER_REGISTRY.md)** - Azure deployment guide
-- 🔧 **[API Documentation](http://localhost:3000/docs)** - Swagger interface
+- �️ FFmpeg: ver notas en `src/config/ffmpeg.ts`
+- 🧪 Tests: `jest` con configuración en `jest.config.js`
+- � API Docs (solo en desarrollo): `http://localhost:3000/api/v1/docs`
+  - Spec: `http://localhost:3000/api/v1/docs/swagger.json`
 
-## ⚙️ Architecture
+## ⚙️ Arquitectura
 
-### **Core Components**
-- **Express.js API** - REST endpoints for video upload and analysis
-- **Gemini LLM** - AI-powered gameplay analysis and content generation
-- **FFmpeg Integration** - Video compression and optimization
-- **MongoDB** - Data persistence and user management
-- **Docker Container** - Production-ready deployment
+### Componentes clave
+- Express 5 (API REST)
+- Gemini (vía `@google/genai`) para análisis de vídeo
+- FFmpeg (vía `fluent-ffmpeg`) para compresión/optimización
+- MongoDB (vía `mongoose`)
+- Autenticación con Steam (Passport + `passport-steam` + sesiones)
 
-### **Project Structure**
+### Estructura del proyecto
 ```
-cs_backend/
-├── 📄 Configuration Files
-│   ├── package.json          # Dependencies and scripts
-│   ├── tsconfig.json         # TypeScript configuration
-│   ├── jest.config.js        # Testing setup
-│   ├── dockerfile            # Container definition
-│   └── docker-compose.yml    # Multi-service orchestration
-│
-├── 🚀 Source Code (src/)
-│   ├── index.ts              # Application entry point
-│   ├── config/
-│   │   └── ffmpeg.ts         # FFmpeg configuration
-│   ├── controllers/
-│   │   ├── authentication.ts # User authentication
-│   │   ├── generation.ts     # AI content generation
-│   │   ├── upload.ts         # Video upload handling
-│   │   ├── db/
-│   │   │   ├── database.ts   # MongoDB connection
-│   │   │   └── schemas.ts    # Data models
-│   │   └── llms/
-│   │       └── gemini_implementation.ts # AI integration
-│   ├── routes/v1/
-│   │   ├── auth.ts           # Authentication routes
-│   │   ├── generation.ts     # Analysis routes
-│   │   ├── user.ts           # User management
-│   │   └── docs.ts           # API documentation
-│   ├── types/                # TypeScript definitions
-│   └── utils/
-│       └── videoCompressor.ts # FFmpeg wrapper
-│
-├── 📋 Documentation
-│   ├── DOCKER_README.md      # Docker setup guide
-│   ├── FFMPEG_SETUP.md       # Video processing guide
-│   └── CONTAINER_REGISTRY.md # Azure deployment guide
-│
-├── 🧪 Testing
-│   └── tests/tests.test.ts   # Unit tests
-│
-└── 🔧 CI/CD
-    └── .github/workflows/    # GitHub Actions
+src/
+├─ index.ts                 # entrypoint
+├─ config/ffmpeg.ts         # checks y presets
+├─ controllers/             # auth, upload, generation, db
+├─ routes/v1/               # auth, generation, user, docs
+├─ types/                   # tipos TS
+└─ utils/videoCompressor.ts # wrapper de compresión
 ```
 
-## 🛠️ Features
+## 🛠️ Funcionalidades
 
-### **Video Processing**
-- ✅ **Multi-format support** - MP4, AVI, MOV, etc.
-- ✅ **Smart compression** - 3 quality levels (low/medium/high)
-- ✅ **Size optimization** - Automatic compression for Gemini API limits
-- ✅ **Metadata extraction** - Duration, resolution, codec information
+### Procesamiento de vídeo
+- Soporte múltiples formatos (mp4, avi, mov, webm…)
+- Compresión automática si > 20MB (presets low/medium/high)
+- Extracción de metadatos básicos
 
-### **AI Analysis**
-- 🤖 **Gemini Integration** - Advanced video understanding
-- 📊 **Gameplay Analysis** - Strategic insights and recommendations
-- 🎯 **Content Generation** - Automated descriptions and highlights
-- 🔄 **Batch Processing** - Multiple video analysis support
+### Análisis con IA
+- Integración con Gemini
+- Límite actual práctico ≈ 20MB por vídeo (antes de base64)
 
-### **API Endpoints**
-- `POST /api/v1/auth/login` - User authentication
-- `POST /api/v1/generation/upload` - Video upload with compression
-- `POST /api/v1/generation/` - AI analysis and content generation
-- `GET /api/v1/user/profile` - User management
-- `GET /docs` - Interactive API documentation
+## 🔌 Endpoints actuales
 
-## 🔧 Dependencies
+- Raíz y estáticos
+  - `GET /` → sirve `static/index.html`
+  - `GET /static/*` y activos (`/main.js`, `favicon`, …)
 
-### **Core Framework**
-*   `express`: 5.1.0 - Web application framework
-*   `typescript`: Latest - Type-safe JavaScript development
-*   `@types/node`: Latest - Node.js type definitions
+- Autenticación (Steam)
+  - `GET /auth/steam`
+  - `GET /auth/steam/return`
+  - `GET /auth/logout`
 
-### **AI & Video Processing**
-*   `@google/genai`: 1.4.0 - Gemini AI integration
-*   `fluent-ffmpeg`: Latest - FFmpeg wrapper for video processing
-*   `ffmpeg-static`: Latest - Static FFmpeg binary
+- Generación/Análisis
+  - `POST /api/v1/generation/upload`  → multipart/form-data (campo `video`)
+    - Respuesta: nombre de archivo procesado y datos de compresión
+  - `POST /api/v1/generation/generate`
+    - Estado actual: usa un vídeo fijo `uploads/subject_1.mp4` (parámetro `videoName` aún no aplicado)
 
-### **Database & Session**
-*   `mongodb`: Latest - MongoDB driver
-*   `express-session`: 1.18.1 - Session management
-*   `mongoose`: Latest - MongoDB object modeling
+- Usuarios
+  - `GET /api/v1/users` (placeholder)
 
-### **Development Tools**
-*   `jest`: Latest - Testing framework
-*   `nodemon`: Latest - Development auto-reload
-*   `swagger-ui-express`: Latest - API documentation
+- Documentación (solo en `NODE_ENV=development`)
+  - `GET /api/v1/docs` (UI)
+  - `GET /api/v1/docs/swagger.json`
 
-## 🚀 Environment Setup
+## ▶️ Ejemplos de uso (cURL)
 
-### **Required Environment Variables**
-Create a `.env` file based on `.env.example`:
-
+Subir vídeo:
 ```bash
-# Server Configuration
-NODE_ENV=development
-PORT=3000
-
-# AI Configuration
-LLM_API_KEY=your_gemini_api_key_here
-LLM_MODEL=gemini-1.5-flash
-
-# Database Configuration
-MONGODB_URI=mongodb://localhost:27017/cs_analyzer
-
-# Session Configuration
-SESSION_SECRET=your_session_secret_here
-
-# FFmpeg Configuration (optional)
-FFMPEG_PRESET=medium
-MAX_FILE_SIZE=100MB
-```
-
-### **Required Software**
-- **Node.js** 18+ with npm
-- **FFmpeg** (included in Docker)
-- **MongoDB** (or MongoDB Atlas)
-- **Docker** (optional but recommended)
-
-## 🐳 Docker Deployment
-
-### **Local Docker Setup**
-```bash
-# Build and start all services
-npm run docker:build
-npm run docker:up
-
-# Check logs
-npm run docker:logs
-
-# Stop services
-npm run docker:down
-```
-
-### **Production Deployment**
-```bash
-# Build production image
-docker build -t cs-backend .
-
-# Run with production settings
-docker run -d \
-  --name cs-backend-prod \
-  -p 3000:3000 \
-  -e NODE_ENV=production \
-  -e LLM_API_KEY="your_key" \
-  cs-backend
-```
-
-## ☁️ Azure Container Registry
-
-### **Automated Deployment**
-1. Push to `Generation_Controller` branch
-2. GitHub Actions builds and pushes to registry
-3. Deploy using Azure Container Instances or Web Apps
-
-### **Manual Deployment**
-```bash
-# Pull latest image
-docker pull csanalyzer.azurecr.io/cs-backend:latest
-
-# Deploy to Azure Container Instance
-az container create \
-  --resource-group cs_analyzer_dev \
-  --name cs-backend \
-  --image csanalyzer.azurecr.io/cs-backend:latest \
-  --dns-name-label cs-backend \
-  --ports 3000
-```
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run tests with coverage
-npm run test:coverage
-```
-
-## 📊 API Usage Examples
-
-### **Upload and Analyze Video**
-```bash
-# Upload video file
 curl -X POST \
   -F "video=@gameplay.mp4" \
   http://localhost:3000/api/v1/generation/upload
+```
 
-# Generate analysis
+Lanzar análisis (estado actual usa un vídeo de ejemplo en `uploads`):
+```bash
 curl -X POST \
   -H "Content-Type: application/json" \
-  -d '{"videoId": "uploaded_video_id"}' \
-  http://localhost:3000/api/v1/generation/
+  -d '{"videoName":"subject_1.mp4"}' \
+  http://localhost:3000/api/v1/generation/generate
 ```
 
-### **User Authentication**
+Iniciar login con Steam (navegador):
+- `http://localhost:3000/auth/steam`
+
+## � Variables de entorno
+
+Crear `.env` en la raíz. Valores típicos:
 ```bash
-# Login user
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -d '{"username": "player1", "password": "password"}' \
-  http://localhost:3000/api/v1/auth/login
+# Servidor
+NODE_ENV=development
+PORT=3000
+
+# LLM
+LLM_PROVIDER=gemini
+LLM_API_KEY=tu_api_key_de_gemini
+
+# Base de datos (usa este nombre en el código actual)
+AZURE_COSMOS_CONNECTIONSTRING=mongodb://localhost:27017/cs_analyzer
+
+# Sesiones y Steam (obligatorios para auth)
+SESSION_SECRET=tu_session_secret
+DOMAIN=http://localhost:3000/
+STEAM_RETURN_URL=http://localhost:3000/auth/
+STEAM_API_KEY=tu_api_key_de_steam
 ```
 
-## 🔧 Troubleshooting
+Notas:
+- La documentación Swagger solo se monta en desarrollo.
+- El código usa `AZURE_COSMOS_CONNECTIONSTRING` para conectar vía `mongoose`. Si prefieres `MONGODB_URI`, añade lógica o ajusta la variable.
+- No se usa `swagger-ui-express`; se sirve UI usando `swagger-ui-dist` + rutas personalizadas.
+- No se incluye `ffmpeg-static`; instala FFmpeg en el sistema o usa Docker.
 
-### **Common Issues**
+## 📦 Dependencias relevantes
 
-**FFmpeg not found:**
+- Runtime
+  - express 5.1.0, helmet 8.1.0
+  - mongoose 8.15.1, express-session 1.18.1, multer 2.0.1
+  - passport 0.7.0, passport-steam 1.0.18
+  - fluent-ffmpeg 2.1.3, swagger-ui-dist 5.24.1
+- Desarrollo
+  - typescript 5.8.3, tsx 4.19.4
+  - jest 29.7.0, ts-jest 29.3.4, @types/*
+  - @google/genai 1.4.0 (usado en runtime; considera moverlo a dependencies para despliegues de producción)
+
+## 🧪 Tests
 ```bash
-# Install FFmpeg locally
-npm install ffmpeg-static
-
-# Or use Docker (recommended)
-npm run docker:up
+npm test
+npm run test:watch
+npm run test:coverage
 ```
 
-**MongoDB connection error:**
+## � Solución de problemas
+
+FFmpeg no encontrado (requerido para comprimir):
 ```bash
-# Check MongoDB is running
+# macOS (Homebrew)
+brew install ffmpeg
+
+# Ubuntu/Debian
+sudo apt update && sudo apt install -y ffmpeg
+```
+
+MongoDB no arranca o no conecta:
+```bash
 mongosh --eval "db.adminCommand('ping')"
-
-# Or use Docker MongoDB
-docker run -d -p 27017:27017 mongo:latest
 ```
 
-**TypeScript compilation errors:**
+Compilación TypeScript:
 ```bash
-# Clean build
-npm run clean
-npm run build
-
-# Check TypeScript configuration
 npx tsc --noEmit
 ```
 
-## 🤝 Contributing
+## 🤝 Contribuir
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the terms specified in LICENSE.MD.
-
-## 🔗 Related Projects
-
-- **Frontend:** CS Analyzer Web Interface
-- **Mobile:** CS Analyzer Mobile App
-- **Analytics:** CS Analyzer Dashboard
+1. Crea rama: `git checkout -b feat/lo-que-sea`
+2. Commits: `git commit -m "feat: ..."`
+3. Push y PR
 
 ---
 
-🎮 **Ready to analyze your Counter-Strike gameplay!** 🚀
-*   `helmet`: 8.1.0
-*   `mongoose`: 8.15.1
-*   `passport`: 0.7.0
-*   `passport-steam`: 1.0.18
-
-## Development Dependencies
-*   `@jest/globals`: 30.0.0-beta.3
-*   `@types/express`: 5.0.3
-*   `@types/express-session`: 1.18.2
-*   `@types/passport-steam`: 1.0.6
-*   `@types/typescript`: 0.4.29
-*   `jest`: 29.7.0
-*   `ts-jest`: 29.3.4
-*   `tsx`: 4.19.4
-*   `typescript`: 5.8.3
-
-## Scripts
-*   `test`: Run tests using Jest.
-*   `test:watch`: Run tests in watch mode.
-*   `test:coverage`: Generate test coverage report.
-*   `test:coverage:watch`: Generate test coverage report in watch mode.
-*   `start:dev`: (Script not defined in package.json)
-
-## Endpoints
-
-The application exposes the following endpoints:
-
-*   `GET /`: Returns a JSON object with the message `API running`.
-*   `/api/v1/auth`: Handles authentication-related routes (defined in `src/routes/v1/auth.ts`).
-*   `/api/v1/users`: Handles user-related routes (defined in `src/routes/v1/user.ts`).
+🎮 ¡Listo para analizar tus partidas de Counter‑Strike!

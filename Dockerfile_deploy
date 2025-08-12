@@ -67,7 +67,6 @@ ENV NODE_ENV=development
 
 EXPOSE 3000
 
-
 # Redirect stdout and stderr to log files in a persistent volume
 VOLUME ["/logs"]
 ENV LOG_STDOUT="/logs/stdout.log"
