@@ -62,7 +62,7 @@ export class GeminiImplementationController implements LLMProvider {
         safetySettings: safetySettings
       };
       
-      const model = 'gemini-1.5-pro';
+      const model = 'gemini-2.5-pro';
       
       const contents = [{
         role: 'user',
