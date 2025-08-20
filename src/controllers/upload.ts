@@ -67,8 +67,8 @@ export default function buildUploadProcessor() {
             
             console.log(`Tamaño del archivo: ${fileSizeMB.toFixed(2)}MB`);
 
-            // Si el archivo es menor a 20MB, no comprimir
-            if (fileSizeMB <= 20) {
+            // Si el archivo es menor a 19.9MB, no comprimir
+            if (fileSizeMB <= 19.9) {
                 console.log('El archivo ya es suficientemente pequeño, no se requiere compresión');
                 return {
                     success: true,

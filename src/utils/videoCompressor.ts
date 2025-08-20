@@ -6,7 +6,6 @@ import { cwd } from 'process';
 export interface CompressionOptions {
   maxSizeMB?: number;
   outputFormat?: string;
-  quality?: 'low' | 'medium' | 'high';
   maxDuration?: number; // segundos
 }
 
@@ -20,9 +19,8 @@ export interface CompressionResult {
 
 export class VideoCompressor {
   private static readonly DEFAULT_OPTIONS: Required<CompressionOptions> = {
-    maxSizeMB: 20,
+    maxSizeMB: 19.9,
     outputFormat: 'mp4',
-    quality: 'low',
     maxDuration: 300 // 5 minutos
   };
 
@@ -51,97 +49,76 @@ export class VideoCompressor {
     const originalStats = await fs.stat(inputPath);
     const originalSizeMB = originalStats.size / (1024 * 1024);
 
-    return new Promise((resolve, reject) => {
-      const command = ffmpeg(inputPath);
+    return new Promise(async (resolve, reject) => {
+      try {
+        // Get video metadata to calculate optimal bitrate
+        const metadata = await this.getVideoInfo(inputPath);
+        const videoDuration = metadata.format.duration;
+        const targetSizeBytes = opts.maxSizeMB * 1024 * 1024;
+        
+        // Calculate target bitrate (accounting for audio overhead)
+        const audioBitrate = 64000; // 64kbps audio
+        const targetVideoBitrate = Math.max(
+          200000, // minimum 200kbps
+          Math.floor((targetSizeBytes * 8) / videoDuration) - audioBitrate
+        );
+        
+        const command = ffmpeg(inputPath)
+          .videoCodec('libx264')
+          .audioCodec('aac')
+          .videoBitrate(targetVideoBitrate)
+          .audioBitrate('64k')
+          .fps(25)
+          .format(opts.outputFormat);
 
-      // Configurar calidad según la opción
-      switch (opts.quality) {
-        case 'low':
-          command
-            .videoCodec('libx264')
-            .audioCodec('aac')
-            .videoBitrate('500k')
-            .audioBitrate('64k')
-            .size('640x360');
-          break;
-        case 'medium':
-          command
-            .videoCodec('libx264')
-            .audioCodec('aac')
-            .videoBitrate('1000k')
-            .audioBitrate('128k')
-            .size('1280x720');
-          break;
-        case 'high':
-          command
-            .videoCodec('libx264')
-            .audioCodec('aac')
-            .videoBitrate('2000k')
-            .audioBitrate('192k')
-            .size('1920x1080');
-          break;
-      }
+        // Limitar duración si es necesario
+        if (opts.maxDuration && videoDuration > opts.maxDuration) {
+          command.duration(opts.maxDuration);
+        }
 
-      // Limitar duración si es necesario
-      if (opts.maxDuration) {
-        command.duration(opts.maxDuration);
-      }
-
-      // Configuraciones adicionales para optimizar compresión
-      command
-        .fps(30)
-        .format(opts.outputFormat)
-        .outputOptions([
-          '-preset', 'medium',
-          '-crf', '28', // Factor de calidad constante (0-51, menor = mejor calidad)
-          '-movflags', '+faststart' // Optimización para streaming
-        ])
-        .on('start', (commandLine) => {
-          console.log('Iniciando compresión con comando:', commandLine);
-        })
-        .on('progress', (progress) => {
-          console.log(`Progreso de compresión: ${Math.round(progress.percent || 0)}%`);
-        })
-        .on('end', async () => {
-          try {
-            // Verificar el tamaño del archivo comprimido
-            const compressedStats = await fs.stat(outputPath);
-            const compressedSizeMB = compressedStats.size / (1024 * 1024);
-            
-            console.log(`Compresión completada. Tamaño original: ${originalSizeMB.toFixed(2)}MB, Comprimido: ${compressedSizeMB.toFixed(2)}MB`);
-            
-            // Si el archivo comprimido sigue siendo muy grande, intentar con calidad más baja
-            if (compressedSizeMB > opts.maxSizeMB && opts.quality !== 'low') {
-              console.log('El archivo comprimido sigue siendo muy grande, intentando con calidad más baja...');
+        // Configuraciones para compresión óptima
+        command
+          .outputOptions([
+            '-preset', 'medium',
+            '-maxrate', `${Math.floor(targetVideoBitrate * 1.2)}`, // 20% buffer
+            '-bufsize', `${Math.floor(targetVideoBitrate * 2)}`, // 2x bitrate buffer
+            '-movflags', '+faststart'
+          ])
+          .on('start', (commandLine) => {
+            console.log('Iniciando compresión con comando:', commandLine);
+            console.log(`Target bitrate: ${Math.floor(targetVideoBitrate / 1000)}kbps para ${opts.maxSizeMB}MB`);
+          })
+          .on('progress', (progress) => {
+            console.log(`Progreso de compresión: ${Math.round(progress.percent || 0)}%`);
+          })
+          .on('end', async () => {
+            try {
+              const compressedStats = await fs.stat(outputPath);
+              const compressedSizeMB = compressedStats.size / (1024 * 1024);
               
-              // Eliminar el archivo temporal
-              await fs.unlink(outputPath);
+              console.log(`Compresión completada. Tamaño original: ${originalSizeMB.toFixed(2)}MB, Comprimido: ${compressedSizeMB.toFixed(2)}MB`);
               
-              // Reintentar con calidad más baja
-              const lowerQualityOptions = { ...opts, quality: 'low' as const };
-              const result = await this.compressVideo(inputPath, lowerQualityOptions);
+              const result: CompressionResult = {
+                originalPath: inputPath,
+                compressedPath: outputPath,
+                originalSizeMB,
+                compressedSizeMB,
+                compressionRatio: originalSizeMB / compressedSizeMB
+              };
+
               resolve(result);
-              return;
+            } catch (error) {
+              reject(new Error(`Error al verificar el archivo comprimido: ${error}`));
             }
-
-            const result: CompressionResult = {
-              originalPath: inputPath,
-              compressedPath: outputPath,
-              originalSizeMB,
-              compressedSizeMB,
-              compressionRatio: originalSizeMB / compressedSizeMB
-            };
-
-            resolve(result);
-          } catch (error) {
-            reject(new Error(`Error al verificar el archivo comprimido: ${error}`));
-          }
-        })
-        .on('error', (error) => {
-          console.error('Error durante la compresión:', error);
-          reject(new Error(`Error de compresión: ${error.message}`));
-        })
-        .save(outputPath);
+          })
+          .on('error', (error) => {
+            console.error('Error durante la compresión:', error);
+            reject(new Error(`Error de compresión: ${error.message}`));
+          })
+          .save(outputPath);
+      } catch (error) {
+        reject(new Error(`Error al obtener información del video: ${error}`));
+      }
     });
   }
 
@@ -150,7 +127,7 @@ export class VideoCompressor {
    */
   static async checkFFmpegAvailable(): Promise<boolean> {
     return new Promise((resolve) => {
-      ffmpeg.getAvailableFormats((err, formats) => {
+      ffmpeg.getAvailableFormats((err) => {
         if (err) {
           console.error('FFmpeg no está disponible:', err.message);
           resolve(false);
