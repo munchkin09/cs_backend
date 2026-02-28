@@ -1,4 +1,4 @@
-import type { IUserModel, IGenerationModel } from '../controllers/db/schemas.js';
+import type { IUserModel, IGenerationModel, ITeamModel, IProjectModel } from '../controllers/db/schemas.js';
 import { ISteamProfile } from './auth.js';
 
 export interface Database {
