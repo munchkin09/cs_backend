@@ -11,10 +11,20 @@ function buildAuthenticationController(): IAuthentication {
     };
 
     // Callback de Steam después de la autenticación
+    // US-002: After successful auth, redirect to team creation if user has no teams
     const steamCallback = async (req: Request, res: Response) => {
         passport.authenticate("steam", { failureRedirect: "/login" })(
-        req,res,() => {
+        req, res, async () => {
             console.log("User authenticated successfully:", req.user);
+            const steamUser = req.user as any;
+            if (steamUser) {
+                const user = await database.getUserBySteamId(steamUser.id);
+                if (user && user.teamIds && user.teamIds.length === 0) {
+                    // New user (no teams yet) – prompt team creation
+                    res.redirect('/?needsTeamSetup=true');
+                    return;
+                }
+            }
             res.redirect("/");
         });
     };
