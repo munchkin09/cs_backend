@@ -5,7 +5,7 @@ import helmet from 'helmet';
 import bodyParser from 'body-parser';
 import { IConfiguration } from './types/index.js';
 import database from './controllers/db/database.js';
-import { buildUserRouter , buildGenerationRouter, buildAuthRouter, buildTeamRouter } from './routes/v1/index.js';
+import { buildUserRouter , buildGenerationRouter, buildAuthRouter, buildTeamRouter, buildProjectRouter } from './routes/v1/index.js';
 import buildDocsRouter from './routes/v1/docs.js';
 import { initializeFFmpeg } from './config/ffmpeg.js';
 
@@ -53,6 +53,9 @@ app.use('/api/v1/users', buildUserRouter());
 
 // US-002: Team management endpoints (create team, list teams)
 app.use('/api/v1/teams', buildTeamRouter());
+
+// US-003: Project management endpoints (create project, list/get projects)
+app.use('/api/v1/projects', buildProjectRouter());
 
 app.use((req, res, next) => {
     // Middleware para manejar errores
